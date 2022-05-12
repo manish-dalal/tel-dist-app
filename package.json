@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "DEBUG=app nodemon --exec babel-node index.js",
     "build-web": "cd web && npm install && npm run build",
-    "build-dist": "rm -rf ../dist-app/* && ./node_modules/.bin/babel . --out-dir ../dist-app --ignore node_modules,web,config.dev.js,proxy.js && cp -r web ../dist-app/web && cp package.json .gitignore ../dist-app",
+    "build-dist": "rm -rf ../dist-app/* && ./node_modules/.bin/babel . --out-dir ../dist-app/dist --ignore node_modules,web,config.dev.js,proxy.js && cp -r web ../dist-app/web && cp package.json .gitignore ../dist-app",
     "serve": "node dist/index.js",
     "start": "NODE_ENV=production node dist/index.js"
   },

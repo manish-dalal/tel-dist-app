@@ -14,7 +14,7 @@ const config = {
   PORT: process.env.PORT || defaultValue.PORT,
   MONGO_API_URL: process.env.MONGO_API_URL || defaultValue.MONGO_API_URL,
   CHANNEL: process.env.CHANNEL || defaultValue.CHANNEL,
-  REPLACE_TEXTS: process.env.REPLACE_TEXTS || defaultValue.REPLACE_TEXTS,
+  REPLACE_TEXTS: process.env.REPLACE_TEXTS || defaultValue.REPLACE_TEXTS || "[]",
   MDISK_TOKEN: process.env.MDISK_TOKEN || defaultValue.MDISK_TOKEN,
   DOODSTREAM_API_KEY: process.env.DOODSTREAM_API_KEY || defaultValue.DOODSTREAM_API_KEY,
   CNAME: process.env.CNAME || defaultValue.CNAME || "v1",
