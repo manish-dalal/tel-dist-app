@@ -8,25 +8,25 @@ const datePattern = `YYYY-MM-DD`;
 const errorLogTransport = new winstonDailyRotateFile({
   level: "error",
   datePattern,
-  filename: path.join(__dirname, "../winstonLogs/errorLogs/log"),
+  filename: path.join(__dirname, "../winstonLogs/error-%DATE%.txt"),
   maxFiles: "7d"
 });
 const infoLogTransport = new winstonDailyRotateFile({
   level: "info",
   datePattern,
-  filename: path.join(__dirname, "../winstonLogs/infoLogs/log"),
+  filename: path.join(__dirname, "../winstonLogs/info-%DATE%.txt"),
   maxFiles: "7d"
 });
 const warnLogTransport = new winstonDailyRotateFile({
   level: "warn",
   datePattern,
-  filename: path.join(__dirname, "../winstonLogs/warnLogs/log"),
+  filename: path.join(__dirname, "../winstonLogs/warn-%DATE%.txt"),
   maxFiles: "7d"
 });
 const debugLogTransport = new winstonDailyRotateFile({
   level: "debug",
   datePattern,
-  filename: path.join(__dirname, "../winstonLogs/debugLogs/log"),
+  filename: path.join(__dirname, "../winstonLogs/debug-%DATE%.txt"),
   maxFiles: "7d"
 });
 const LoggerJSON = {
@@ -44,10 +44,10 @@ const LoggerJSON = {
   })
 };
 const Logger = {
-  error: (msg, ...other) => LoggerJSON.error.log("error", msg, ...other),
-  info: (msg, ...other) => LoggerJSON.info.log("info", msg, ...other),
-  warn: (msg, ...other) => LoggerJSON.warn.log("warn", msg, ...other),
-  debug: (msg, ...other) => LoggerJSON.debug.log("debug", msg, ...other)
+  error: (msg, ...other) => LoggerJSON.error.log("error", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other),
+  info: (msg, ...other) => LoggerJSON.info.log("info", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other),
+  warn: (msg, ...other) => LoggerJSON.warn.log("warn", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other),
+  debug: (msg, ...other) => LoggerJSON.debug.log("debug", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other)
 };
 module.exports = {
   Logger,

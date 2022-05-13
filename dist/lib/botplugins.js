@@ -357,7 +357,7 @@ const processMessages = async bot => {
             // const messageData = await bot.sendMessage(chatId, `Uploaded ${tempData.indexOf(el) + 1}/${tempData.length}`);
             // lastMessageData = messageData;
           } catch (error) {
-            Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> ${error.message || "SaveMsg error occured"}`);
+            Logger.error(error.message || "SaveMsg error occured");
           }
         } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER) {
           const convertedStr = await multiLinkCon(msg.caption || msg.text, mode);
@@ -412,7 +412,7 @@ const processMessages = async bot => {
 
             additionalAction && additionalAction();
           } catch (errorDb) {
-            Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> ${errorDb.message || "Sendgp error occured"}`);
+            Logger.error(errorDb.message || "Sendgp error occured");
             msg.additionalAction && msg.additionalAction(errorDb.message);
             console.log("errorDb#####", errorDb.message);
           }
@@ -424,7 +424,7 @@ const processMessages = async bot => {
         }
       } catch (error) {
         isMessageProcessing = false;
-        Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> ${error.message || "An error occured"}`);
+        Logger.error(error.message || "An error occured");
         bot.sendMessage(chatId, error.message || "An error occured");
       }
 

@@ -25,7 +25,7 @@ router.post("/add", async (req, res) => {
   } = await axios.post(`${serverUrl}/task/`, body);
 
   if (!data) {
-    Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> Error Add task`);
+    Logger.error("Error Add task");
     res.send({
       error: true,
       errorMessage: "Error message"
@@ -45,7 +45,7 @@ router.post("/update", async (req, res) => {
   } = await axios.put(`${serverUrl}/task/${body._id}`, body);
 
   if (!data) {
-    Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> Error update task`);
+    Logger.error("Error update task");
     res.send({
       error: true,
       errorMessage: "Error message"
@@ -66,7 +66,7 @@ router.post("/remove", async (req, res) => {
   });
 
   if (!data) {
-    Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> Error remove task`);
+    Logger.error("Error remove task");
     res.send({
       error: true,
       errorMessage: "Error message"
@@ -88,7 +88,7 @@ router.get("/list", async (req, res) => {
       ...data
     });
   } catch (e) {
-    Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> ${e.message || "tasklist error occured"}`);
+    Logger.error(e.message || "tasklist error occured");
     res.json({
       error: true,
       errorMessage: e.message
@@ -165,7 +165,7 @@ router.post("/start", async (req, res) => {
     });
   } catch (e) {
     console.log("eeeeee", e);
-    Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> ${e.message || "taskstart error occured"}`);
+    Logger.error(e.message || "taskstart error occured");
     res.json({
       error: true,
       errorMessage: e.message
@@ -181,7 +181,7 @@ router.get("/telegramget", async (req, res) => {
       data
     });
   } catch (error) {
-    Logger.error(`${new Date().toLocaleTimeString("en-IN")}=> ${error.message || "telegramget error occured"}`);
+    Logger.error(error.message || "telegramget error occured");
     return res.json({
       error: true,
       error: error.message

@@ -103,7 +103,8 @@ Available modes:
 function bot(torrent, bot) {
   bot.on("callback_query", callbackQuery => {
     const msg = callbackQuery.message;
-    Logger.info(`${new Date().toLocaleTimeString("en-IN")}=> ${JSON.stringify(callbackQuery?.from)}`);
+    Logger.info(JSON.stringify({ ...callbackQuery?.from
+    }));
     console.log("msg ==========", JSON.stringify(callbackQuery));
 
     if (setcategoryRegex.test(msg.text)) {
@@ -384,7 +385,8 @@ function bot(torrent, bot) {
   bot.on("message", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
-    Logger.info(`${new Date().toLocaleTimeString("en-IN")}=> ${JSON.stringify(msg?.from)}`);
+    Logger.info(JSON.stringify({ ...msg?.from
+    }));
 
     if (!(msg.text && msg.text.startsWith("/"))) {
       pushInMessageQueue({
