@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Torrent bot for downloading and searching torrents",
   "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "dev": "DEBUG=app nodemon --exec babel-node index.js",
     "build-web": "cd web && npm install && npm run build",
