@@ -8,6 +8,8 @@ const bodyParser = require("body-parser");
 
 const serveIndex = require("serve-index");
 
+const path = require("path");
+
 const humanTime = require("./utils/humanTime");
 
 const {
@@ -52,17 +54,18 @@ server.get("/logs", (req, res) => res.sendFile("logs.txt", {
   root: __dirname
 }));
 server.get("/claarlogs", (req, res) => {
-  const dir = "./winstonLogs";
+  const dir = path.join(__dirname, "winstonLogs");
   fs.rm(dir, {
     recursive: true
   }, () => {
+    fs.mkdir(dir);
     return res.send(`Successfully removed file with the path of ${dir}`);
   });
 });
-server.use("/logss", express.static("winstonLogs"), serveIndex("winstonLogs", {
+server.use("/logss", express.static(path.join(__dirname, "winstonLogs")), serveIndex(path.join(__dirname, "winstonLogs"), {
   icons: true
 }));
-server.use("/downloads", express.static("downloads"), serveIndex("downloads", {
+server.use("/downloads", express.static(path.join(__dirname, "downloads")), serveIndex(path.join(__dirname, "downloads"), {
   icons: true
 }));
 server.use("/api/v1/drive/folder", async (req, res) => {
@@ -124,7 +127,7 @@ server.get("/api/v1/status", async (req, res) => {
 
 if (allowWeb) {
   console.log("web allowed", "env", process.env.NODE_ENV);
-  server.use("/static", express.static("web/build/static"));
+  server.use("/static", express.static(path.join(__dirname, "web/build/static")));
   server.all("*", (req, res) => res.sendFile("web/build/index.html", {
     root: __dirname
   }));
