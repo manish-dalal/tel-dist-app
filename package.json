@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "DEBUG=app nodemon --exec babel-node index.js",
     "build-web": "cd web && npm install && npm run build",
-    "build-dist": "rm -rf ../dist-app/* && ./node_modules/.bin/babel . --out-dir ../dist-app/dist --ignore node_modules,web,config.dev.js,proxy.js && cp -r web ../dist-app/dist/web && cp package.json .gitignore ../dist-app",
+    "build-dist": "rm -rf ../dist-app/dist && ./node_modules/.bin/babel . --out-dir ../dist-app/dist --ignore node_modules,web,config.dev.js,proxy.js && cp -r web ../dist-app/dist/web && cp package.json .gitignore ../dist-app",
     "serve": "node dist/index.js",
     "start": "NODE_ENV=production node dist/index.js"
   },
@@ -54,6 +54,7 @@
     "prop-types": "^15.8.1",
     "puppeteer": "^14.0.0",
     "readline": "^1.3.0",
+    "serve": "^13.0.2",
     "serve-index": "^1.9.1",
     "tall": "^5.0.0",
     "webtorrent": "^1.8.19",
