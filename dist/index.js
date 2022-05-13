@@ -10,13 +10,20 @@ const serveIndex = require("serve-index");
 
 const humanTime = require("./utils/humanTime");
 
-const { keepalive } = require("./utils/keepalive");
+const {
+  keepalive
+} = require("./utils/keepalive");
 
 const diskinfo = require("./utils/diskinfo");
 
 const status = require("./utils/status");
 
-const { getFiles, sendFileStream, getAuthURL, getAuthToken } = require("./utils/gdrive");
+const {
+  getFiles,
+  sendFileStream,
+  getAuthURL,
+  getAuthToken
+} = require("./utils/gdrive");
 
 const search = require("./routes/search");
 
@@ -41,37 +48,23 @@ server.use((req, res, next) => {
   next();
 });
 server.get("/ping", (req, res) => res.send("pong"));
-server.get("/logs", (req, res) =>
-  res.sendFile("logs.txt", {
-    root: __dirname
-  })
-);
+server.get("/logs", (req, res) => res.sendFile("logs.txt", {
+  root: __dirname
+}));
 server.get("/claarlogs", (req, res) => {
   const dir = "./winstonLogs";
-  fs.rm(
-    dir,
-    {
-      recursive: true
-    },
-    () => {
-      return res.send(`Successfully removed file with the path of ${dir}`);
-    }
-  );
+  fs.rm(dir, {
+    recursive: true
+  }, () => {
+    return res.send(`Successfully removed file with the path of ${dir}`);
+  });
 });
-server.use(
-  "/logss",
-  express.static("winstonLogs"),
-  serveIndex("winstonLogs", {
-    icons: true
-  })
-);
-server.use(
-  "/downloads",
-  express.static("downloads"),
-  serveIndex("downloads", {
-    icons: true
-  })
-);
+server.use("/logss", express.static("winstonLogs"), serveIndex("winstonLogs", {
+  icons: true
+}));
+server.use("/downloads", express.static("downloads"), serveIndex("downloads", {
+  icons: true
+}));
 server.use("/api/v1/drive/folder", async (req, res) => {
   const folderId = req.query.id;
   res.send(await getFiles(folderId));
@@ -82,19 +75,15 @@ server.use("/api/v1/drive/getAuthURL", (req, res) => {
   const CLIENT_SECRET = req.query.clientSecret;
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
-    res.send(
-      JSON.stringify({
-        error: "Client Id and secret are required"
-      })
-    );
+    res.send(JSON.stringify({
+      error: "Client Id and secret are required"
+    }));
   } else {
     const authURL = getAuthURL(CLIENT_ID, CLIENT_SECRET);
-    res.send(
-      JSON.stringify({
-        error: "",
-        authURL
-      })
-    );
+    res.send(JSON.stringify({
+      error: "",
+      authURL
+    }));
   }
 });
 server.use("/api/v1/drive/getAuthToken", async (req, res) => {
@@ -103,19 +92,15 @@ server.use("/api/v1/drive/getAuthToken", async (req, res) => {
   const AUTH_CODE = req.query.authCode;
 
   if (!CLIENT_ID || !CLIENT_SECRET || !AUTH_CODE) {
-    res.send(
-      JSON.stringify({
-        error: "Client Id and secret and auth code are required"
-      })
-    );
+    res.send(JSON.stringify({
+      error: "Client Id and secret and auth code are required"
+    }));
   } else {
     const token = await getAuthToken(CLIENT_ID, CLIENT_SECRET, AUTH_CODE);
-    res.send(
-      JSON.stringify({
-        token,
-        error: ""
-      })
-    );
+    res.send(JSON.stringify({
+      token,
+      error: ""
+    }));
   }
 });
 server.use("/api/v1/torrent", torrent);
@@ -140,11 +125,9 @@ server.get("/api/v1/status", async (req, res) => {
 if (allowWeb) {
   console.log("web allowed", "env", process.env.NODE_ENV);
   server.use("/static", express.static("web/build/static"));
-  server.all("*", (req, res) =>
-    res.sendFile("web/build/index.html", {
-      root: __dirname
-    })
-  );
+  server.all("*", (req, res) => res.sendFile("web/build/index.html", {
+    root: __dirname
+  }));
 } else {
   console.log("web disabled");
 }
