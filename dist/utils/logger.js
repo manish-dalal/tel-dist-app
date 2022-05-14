@@ -1,7 +1,8 @@
 const fs = require("fs");
 
-const logFile = "./logs.txt";
-fs.writeFileSync(logFile, "");
+const path = require("path");
+
+const logFile = path.join(__dirname, "..", "logs.txt"); // fs.writeFileSync(logFile, "");
 
 function logger(...args) {
   let toWrite = "\n";
