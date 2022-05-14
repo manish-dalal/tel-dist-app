@@ -53,12 +53,21 @@ server.get("/ping", (req, res) => res.send("pong"));
 server.get("/logs", (req, res) => res.sendFile("logs.txt", {
   root: __dirname
 }));
-server.get("/claarlogs", (req, res) => {
+server.get("/clearlogs", (req, res) => {
   const dir = path.join(__dirname, "winstonLogs");
+  fs.writeFile(path.join(__dirname, "logs.txt"), "", function () {
+    console.log("logs.txt cleared");
+  });
   fs.rm(dir, {
     recursive: true
   }, () => {
-    fs.mkdir(dir);
+    fs.mkdir(dir, err => {
+      if (err) {
+        return console.error(err);
+      }
+
+      console.log(`Directory created successfully! ${dir}`);
+    });
     return res.send(`Successfully removed file with the path of ${dir}`);
   });
 });

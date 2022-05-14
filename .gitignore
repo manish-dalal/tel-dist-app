@@ -2,5 +2,4 @@ node_modules/
 .next/
 test.js
 config.dev.js
-logs.txt
 winstonLogs/
