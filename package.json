@@ -9,10 +9,10 @@
   "scripts": {
     "dev": "DEBUG=app nodemon --exec babel-node index.js",
     "build-web": "cd web && npm install && npm run build",
-    "build-main": "rm -rf dist && ./node_modules/.bin/babel . --out-dir dist --ignore node_modules,web,config.dev.js,proxy.js && mkdir -p dist/web && cp -r web/build dist/web/build && cp logs.txt dist",
+    "build-main": "rm -rf dist && ./node_modules/.bin/babel . --out-dir dist --ignore node_modules,web,config.dev.js,proxy.js && mkdir -p dist/web && cp -r web/build dist/web/build && touch dist/logs.txt",
     "serve": "node dist/index.js",
     "start": "NODE_ENV=production node dist/index.js",
-    "deploy": "rm -rf ../dist-app/dist && cp package.json .gitignore  app.json ../dist-app && cp -r dist ../dist-app"
+    "deploy": "npm run build-main && rm -rf ../dist-app/dist && cp package.json .gitignore  app.json ../dist-app && cp -r dist ../dist-app && rm -rf dist"
   },
   "keywords": [
     "torrent",

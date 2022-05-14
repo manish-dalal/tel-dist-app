@@ -4,6 +4,8 @@ const winstonDailyRotateFile = require("winston-daily-rotate-file");
 
 const path = require("path");
 
+const logger = require("./logger");
+
 const datePattern = `YYYY-MM-DD`;
 const errorLogTransport = new winstonDailyRotateFile({
   level: "error",
@@ -44,10 +46,22 @@ const LoggerJSON = {
   })
 };
 const Logger = {
-  error: (msg, ...other) => LoggerJSON.error.log("error", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other),
-  info: (msg, ...other) => LoggerJSON.info.log("info", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other),
-  warn: (msg, ...other) => LoggerJSON.warn.log("warn", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other),
-  debug: (msg, ...other) => LoggerJSON.debug.log("debug", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other)
+  error: (msg, ...other) => {
+    logger("error ", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`);
+    return LoggerJSON.error.log("error", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other);
+  },
+  info: (msg, ...other) => {
+    logger("info ", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`);
+    return LoggerJSON.info.log("info", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other);
+  },
+  warn: (msg, ...other) => {
+    logger("warn ", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`);
+    return LoggerJSON.warn.log("warn", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other);
+  },
+  debug: (msg, ...other) => {
+    logger("debug ", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`);
+    return LoggerJSON.debug.log("debug", `${new Date().toLocaleTimeString("en-IN")}=> ${msg}`, ...other);
+  }
 };
 module.exports = {
   Logger,
