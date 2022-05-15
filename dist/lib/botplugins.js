@@ -386,10 +386,13 @@ const processMessages = async bot => {
               additionalAction,
               thumbUrl = "",
               imgDriveId = "",
-              maniChannelName = config.CHANNEL
+              maniChannelName = config.CHANNEL,
+              isNewMdisk = false,
+              isEuOrgLink = true
             } = msg;
             await sleep(5000);
-            const clStr = await multiLinkCon(msg.text, iMode.COIN, maniChannelName);
+            const clStrTemp = isNewMdisk ? await multiLinkCon(msg.text, iMode.MDISK, maniChannelName) : msg.text;
+            const clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
               caption: clStr
             };

@@ -18,7 +18,7 @@ const router = express.Router();
 router.post("/add", async (req, res) => {
   const body = req.body;
   body.botToken = config.TELEGRAM_TOKEN;
-  body.cname = config.CNAME;
+  body.cname = body.cname || config.CNAME;
   body.status = "active";
   const {
     data
@@ -40,6 +40,7 @@ router.post("/add", async (req, res) => {
 router.post("/update", async (req, res) => {
   const body = req.body; // body.botToken = config.TELEGRAM_TOKEN;
 
+  body.cname = body.cname || config.CNAME;
   const {
     data
   } = await axios.put(`${serverUrl}/task/${body._id}`, body);
@@ -108,7 +109,9 @@ router.post("/start", async (req, res) => {
         thumbUrl,
         groupInfo,
         _id,
-        pageIncrementor = 1
+        pageIncrementor = 1,
+        isEuOrgLink = true,
+        isNewMdisk
       } = task;
       const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, {
         status: "processing",
@@ -130,12 +133,12 @@ router.post("/start", async (req, res) => {
         messages
       } = messageResponse.data;
       messages.forEach(element => {
-        const msg = {
+        const msg = { ...element,
           targetChatId: groupInfo.id,
           thumbUrl,
-          imgDriveId: element.imgDriveId,
           maniChannelName: channelName,
-          text: element.text
+          isEuOrgLink,
+          isNewMdisk
         };
 
         if (messages[messages.length - 1] === element) {
