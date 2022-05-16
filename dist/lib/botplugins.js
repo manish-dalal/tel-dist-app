@@ -18,10 +18,6 @@ const {
   Logger
 } = require("../utils/winston");
 
-const {
-  serializeError
-} = require("serialize-error");
-
 let dataArray = [];
 let isMessageProcessing = false;
 let processStats = {};
@@ -421,8 +417,7 @@ const processMessages = async bot => {
           } catch (errorDb) {
             msg.additionalAction && msg.additionalAction(errorDb.message);
             console.log("errorDb#####", errorDb.message);
-            Logger.error(errorDb.message || "Sendgp error occured");
-            Logger.error(serializeError(errorDb) || "serializeError====");
+            Logger.error(errorDb.message || "Sendgp error occured"); // Logger.error(serializeError(errorDb) || "serializeError====");
           }
         } else if (mode === iMode.MESSAGEINFO) {
           msg.text && delete msg.text;
@@ -432,8 +427,8 @@ const processMessages = async bot => {
         }
       } catch (error) {
         isMessageProcessing = false;
-        Logger.error(error.message || "An error occured");
-        Logger.error(serializeError(error) || "serializeError====error ");
+        Logger.error(error.message || "An error occured"); // Logger.error(serializeError(error) || "serializeError====error ");
+
         bot.sendMessage(chatId, error.message || "An error occured");
       }
 
