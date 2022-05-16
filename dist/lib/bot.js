@@ -85,19 +85,8 @@ const helpText = `You can control me by sending these commands:
 /setcategory - Update active category
 /getcategory - get active category
 /setlinktype - main site used
-/setfileid - Set thumb file
-/getfileid - Get active thumb id
-/getpartition - Get partition
-/setpartition - Set partition
-/getstats - count by fisrt_name
 /getprocessstats - process stats
 /help - Get help info \n
-Available modes:
-0 - Doodstream/mdisk uploader
-1 - Add thumb image to message
-2 - Mdisk duplicate link remover
-3 - Convert link to fdisk.in
-4 - Saving message to DB 
         "𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
 
 function bot(torrent, bot) {
@@ -169,6 +158,9 @@ function bot(torrent, bot) {
       }], [{
         text: "English Bulk",
         callback_data: 5
+      }, {
+        text: "Tango&onlyfans",
+        callback_data: 6
       }]]
     };
     const opts = {
