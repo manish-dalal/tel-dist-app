@@ -1,3 +1,5 @@
+"use strict";
+
 const puppeteer = require("puppeteer");
 
 const PIRATEBAY_SITE = process.env.PIRATEBAY_SITE || "https://thepiratebay.org/search/{term}";

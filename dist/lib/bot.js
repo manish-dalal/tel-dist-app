@@ -1,3 +1,5 @@
+"use strict";
+
 const axios = require("axios");
 
 const status = require("../utils/status");
@@ -92,7 +94,7 @@ const helpText = `You can control me by sending these commands:
 function bot(torrent, bot) {
   bot.on("callback_query", callbackQuery => {
     const msg = callbackQuery.message;
-    Logger.info(JSON.stringify({ ...callbackQuery?.from
+    Logger.info(JSON.stringify({ ...(callbackQuery === null || callbackQuery === void 0 ? void 0 : callbackQuery.from)
     }));
     console.log("msg ==========", JSON.stringify(callbackQuery));
 
@@ -377,7 +379,7 @@ function bot(torrent, bot) {
   bot.on("message", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
-    Logger.info(JSON.stringify({ ...msg?.from
+    Logger.info(JSON.stringify({ ...(msg === null || msg === void 0 ? void 0 : msg.from)
     }));
 
     if (!(msg.text && msg.text.startsWith("/"))) {

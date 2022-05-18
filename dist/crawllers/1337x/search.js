@@ -1,3 +1,5 @@
+"use strict";
+
 const puppeteer = require("puppeteer");
 
 const O337X_SITE = process.env.O337X_SITE || "https://www.1337x.am/search/{term}/1/";

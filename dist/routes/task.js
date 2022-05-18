@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 
 const config = require("../config");
@@ -145,7 +147,8 @@ router.post("/start", async (req, res) => {
           msg["additionalAction"] = async (errorMess = "") => {
             const parsePage = parseInt(page);
             const parsepageIncrementor = parseInt(pageIncrementor);
-            const nextPage = totalpages === parsePage ? 0 : parsePage + parsepageIncrementor;
+            const expectedNextPage = parsePage + parsepageIncrementor;
+            const nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
             const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, {
               status: errorMess || "active",
               page: nextPage

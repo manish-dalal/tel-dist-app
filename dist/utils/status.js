@@ -1,3 +1,5 @@
+"use strict";
+
 const diskinfo = require("./diskinfo");
 
 const humanTime = require("../utils/humanTime");

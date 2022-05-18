@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 
 const piratebayDetails = require("../crawllers/piratebay/details");

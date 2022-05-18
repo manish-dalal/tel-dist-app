@@ -1,3 +1,5 @@
+"use strict";
+
 const {
   uploadFileStream
 } = require("../utils/gdrive");
@@ -17,6 +19,10 @@ var emojiStrip = require("emoji-strip");
 const {
   Logger
 } = require("../utils/winston");
+
+const {
+  getCloudinarySignature
+} = require("../utils/getCloudinarySignature");
 
 let dataArray = [];
 let isMessageProcessing = false;
@@ -68,7 +74,7 @@ const getFileData = (msg, activeLinkType) => {
     fileId = msg.audio.file_id;
   } else if (msg.photo) {
     const lastPhoto = msg.photo[msg.photo.length - 1];
-    mimeType = lastPhoto?.mimeType || "image/jpeg";
+    mimeType = (lastPhoto === null || lastPhoto === void 0 ? void 0 : lastPhoto.mimeType) || "image/jpeg";
     fileName = `${activeLinkType}-${getDateString()}-${msg.message_id}.jpeg`;
     fileId = lastPhoto.file_id;
   }
@@ -309,6 +315,8 @@ const processMessages = async bot => {
     let lastMessageData = {};
 
     for (const el of tempData) {
+      var _msg$chat;
+
       const {
         msg = {},
         match,
@@ -321,13 +329,14 @@ const processMessages = async bot => {
       processStats.nextData = dataArray.length;
       console.log("inddddddex", processStats.current, "of ", processStats.total);
       console.log("Next data Length", processStats.nextData);
-      const chatId = msg?.chat?.id;
+      const chatId = msg === null || msg === void 0 ? void 0 : (_msg$chat = msg.chat) === null || _msg$chat === void 0 ? void 0 : _msg$chat.id;
 
       try {
         // for for saving message to db
         if (mode === iMode.SAVEDB && mongoApiUrl) {
           try {
             let imgDriveId = "";
+            let cloudinaryUrl = "";
             const clStr = removeUsername(msg.caption || msg.text);
 
             if (msg.photo) {
@@ -338,6 +347,25 @@ const processMessages = async bot => {
               } = getFileData(msg, activeLinkType);
               const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
               imgDriveId = uploadedFile.data.id;
+              const sigData = getCloudinarySignature();
+
+              if (imgDriveId && sigData.apikey && sigData.signature) {
+                try {
+                  const formData = new URLSearchParams();
+                  formData.append("file", `https://drive.google.com/uc?export=view&id=${imgDriveId}`);
+                  formData.append("api_key", sigData.apikey);
+                  formData.append("timestamp", sigData.timestamp);
+                  formData.append("signature", sigData.signature);
+                  formData.append("folder", sigData.folder);
+                  const url = "https://api.cloudinary.com/v1_1/" + sigData.cloudname + "/auto/upload";
+                  const {
+                    data: cuData = {}
+                  } = await axios.post(url, formData);
+                  cloudinaryUrl = cuData.secure_url;
+                } catch (cuerror) {
+                  console.log("cuerror", cuerror);
+                }
+              }
             }
 
             const params = {
@@ -346,6 +374,10 @@ const processMessages = async bot => {
               category: category.toString(),
               linkType: activeLinkType
             };
+
+            if (cloudinaryUrl && cloudinaryUrl.length) {
+              params.cloudinaryUrl = cloudinaryUrl;
+            }
 
             if (config.CNAME) {
               params.cname = config.CNAME;
@@ -388,9 +420,10 @@ const processMessages = async bot => {
               imgDriveId = "",
               maniChannelName = config.CHANNEL,
               isNewMdisk = false,
-              isEuOrgLink = true
+              isEuOrgLink = true,
+              cloudinaryUrl
             } = msg;
-            await sleep(5000);
+            await sleep(4000);
             const clStrTemp = isNewMdisk ? await multiLinkCon(msg.text, iMode.MDISK, maniChannelName) : msg.text;
             const clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
@@ -403,9 +436,9 @@ const processMessages = async bot => {
               }]]
             };
 
-            if (thumbUrl || imgDriveId) {
+            if (thumbUrl || imgDriveId || cloudinaryUrl) {
               const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
-              const imageUrl = thumbUrl || tempUrl; // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
+              const imageUrl = thumbUrl || (cloudinaryUrl ? cloudinaryUrl : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
 
               console.log("imageUrl##", imageUrl);
               const sendData = await bot.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);

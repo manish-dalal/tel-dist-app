@@ -1,3 +1,5 @@
+"use strict";
+
 const puppeteer = require("puppeteer");
 
 const LIMETORRENT_SITE = process.env.LIMETORRENT_SITE || "https://limetorrents.at/search?search={term}";

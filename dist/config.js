@@ -1,3 +1,5 @@
+"use strict";
+
 const dev = process.env.NODE_ENV !== "production";
 const defaultValue = dev ? require("./config.dev") : {};
 const config = {
@@ -23,6 +25,9 @@ const config = {
   DEFAULT_CATEGORY: process.env.DEFAULT_CATEGORY || defaultValue.DEFAULT_CATEGORY,
   KEEPLIVE_TIME: process.env.KEEPLIVE_TIME || defaultValue.KEEPLIVE_TIME,
   KEEPLIVE_INTERVAL: process.env.KEEPLIVE_INTERVAL || defaultValue.KEEPLIVE_INTERVAL,
-  THUMB_FILE_ID: process.env.THUMB_FILE_ID || defaultValue.THUMB_FILE_ID || "https://drive.google.com/uc?export=view&id=1GK6SH3Kwgu-Nwr4ilQPyiKuk26tbZmxb"
+  THUMB_FILE_ID: process.env.THUMB_FILE_ID || defaultValue.THUMB_FILE_ID || "https://drive.google.com/uc?export=view&id=1GK6SH3Kwgu-Nwr4ilQPyiKuk26tbZmxb",
+  CLOUDINARY_NAME: process.env.CLOUDINARY_NAME || defaultValue.CLOUDINARY_NAME,
+  CLOUDINARY_API: process.env.CLOUDINARY_API || defaultValue.CLOUDINARY_API,
+  CLOUDINARY_SECRET: process.env.CLOUDINARY_SECRET || defaultValue.CLOUDINARY_SECRET
 };
 module.exports = config;

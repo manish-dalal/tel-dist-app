@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 
 const telegram = require("node-telegram-bot-api");

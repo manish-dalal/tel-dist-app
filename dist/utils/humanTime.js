@@ -1,3 +1,5 @@
+"use strict";
+
 function humanTime(ms) {
   let seconds = ms / 1000;
   let result = "";

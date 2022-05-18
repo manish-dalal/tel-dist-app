@@ -1,3 +1,5 @@
+"use strict";
+
 function prettyBytes(num) {
   var exponent,
       unit,

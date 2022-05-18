@@ -1,3 +1,5 @@
+"use strict";
+
 const {
   zip
 } = require("zip-a-folder");

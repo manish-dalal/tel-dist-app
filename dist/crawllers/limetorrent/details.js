@@ -1,3 +1,5 @@
+"use strict";
+
 const puppeteer = require("puppeteer");
 
 async function details(link) {
