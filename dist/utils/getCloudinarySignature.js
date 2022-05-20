@@ -9,9 +9,7 @@ var _cloudinary = require("cloudinary");
 
 require("./cloudinary");
 
-const folder = "m1";
-
-const getCloudinarySignature = () => {
+const getCloudinarySignature = (folder = "m1") => {
   const apiSecret = _cloudinary.v2.config().api_secret;
 
   const cloudName = _cloudinary.v2.config().cloud_name;

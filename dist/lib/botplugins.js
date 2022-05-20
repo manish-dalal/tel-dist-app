@@ -347,12 +347,14 @@ const processMessages = async bot => {
               } = getFileData(msg, activeLinkType);
               const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
               imgDriveId = uploadedFile.data.id;
-              const sigData = getCloudinarySignature();
+              const sigData = getCloudinarySignature(`${activeLinkType}1`);
 
               if (imgDriveId && sigData.apikey && sigData.signature) {
                 try {
-                  const formData = new URLSearchParams();
-                  formData.append("file", `https://drive.google.com/uc?export=view&id=${imgDriveId}`);
+                  const formData = new URLSearchParams(); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`
+
+                  const driveUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
+                  formData.append("file", driveUrl);
                   formData.append("api_key", sigData.apikey);
                   formData.append("timestamp", sigData.timestamp);
                   formData.append("signature", sigData.signature);
@@ -412,6 +414,8 @@ const processMessages = async bot => {
           };
           await bot.sendPhoto(chatId, config.THUMB_FILE_ID, opts);
         } else if (mode === iMode.DBMESSAGESENDER) {
+          let imageUrl = "";
+
           try {
             const {
               targetChatId,
@@ -423,7 +427,7 @@ const processMessages = async bot => {
               isEuOrgLink = true,
               cloudinaryUrl
             } = msg;
-            await sleep(4000);
+            await sleep(5000);
             const clStrTemp = isNewMdisk ? await multiLinkCon(msg.text, iMode.MDISK, maniChannelName) : msg.text;
             const clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
@@ -438,7 +442,7 @@ const processMessages = async bot => {
 
             if (thumbUrl || imgDriveId || cloudinaryUrl) {
               const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
-              const imageUrl = thumbUrl || (cloudinaryUrl ? cloudinaryUrl : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
+              imageUrl = thumbUrl || (cloudinaryUrl ? cloudinaryUrl : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
 
               console.log("imageUrl##", imageUrl);
               const sendData = await bot.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);
@@ -450,7 +454,8 @@ const processMessages = async bot => {
           } catch (errorDb) {
             msg.additionalAction && msg.additionalAction(errorDb.message);
             console.log("errorDb#####", errorDb.message);
-            Logger.error(errorDb.message || "Sendgp error occured"); // Logger.error(serializeError(errorDb) || "serializeError====");
+            Logger.error(`DBMESSAGESENDER  ${errorDb.message}` || "Sendgp error occured");
+            Logger.error(`Img=  ${imageUrl}`); // Logger.error(serializeError(errorDb) || "serializeError====");
           }
         } else if (mode === iMode.MESSAGEINFO) {
           msg.text && delete msg.text;
