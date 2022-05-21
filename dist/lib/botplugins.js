@@ -442,7 +442,7 @@ const processMessages = async bot => {
 
             if (thumbUrl || imgDriveId || cloudinaryUrl) {
               const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
-              imageUrl = thumbUrl || (cloudinaryUrl ? cloudinaryUrl : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
+              imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?sample` : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
 
               console.log("imageUrl##", imageUrl);
               const sendData = await bot.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);
