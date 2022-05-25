@@ -7,7 +7,7 @@ const config = require("../config");
 const humanTime = require("./humanTime");
 
 const KEEPLIVE_SITE = `${config.SERVER_SITE}/keepalive`;
-const KEEPLIVE_TIME = config.KEEPLIVE_TIME || 40;
+const KEEPLIVE_TIME = config.KEEPLIVE_TIME || 80;
 const KEEPLIVE_INTERVAL = config.KEEPLIVE_INTERVAL || 280000;
 
 function addMinutes(date, minutes) {

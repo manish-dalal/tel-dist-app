@@ -427,7 +427,7 @@ const processMessages = async bot => {
               isEuOrgLink = true,
               cloudinaryUrl
             } = msg;
-            await sleep(5000);
+            await sleep(7000);
             const clStrTemp = isNewMdisk ? await multiLinkCon(msg.text, iMode.MDISK, maniChannelName) : msg.text;
             const clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
@@ -442,7 +442,7 @@ const processMessages = async bot => {
 
             if (thumbUrl || imgDriveId || cloudinaryUrl) {
               const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
-              imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?sample` : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
+              imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${Math.random().toFixed(1)}` : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
 
               console.log("imageUrl##", imageUrl);
               const sendData = await bot.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);
