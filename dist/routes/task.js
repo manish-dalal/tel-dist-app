@@ -178,6 +178,53 @@ router.post("/start", async (req, res) => {
     });
   }
 });
+router.get("/backupMessage", async (req, res) => {
+  try {
+    const defaultText = `𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐃 𝐁𝐘 @primexmov
+
+    Sabhi Log Backup Channel Bhi Join Kerlo Jab Bhi Ye Channel Ban Hoga Toh New Channel Ki Link Issme Mil Jayegi 💦✊🏿👇🏻 
+    https://t.me/primexmov`; // const urlstr = new URLSearchParams({
+    //   text: defaultText
+    // }).toString();
+    // console.log("urlstr=", urlstr);
+
+    const {
+      linkType,
+      text = defaultText
+    } = req.query;
+    const {
+      data
+    } = await axios.get(`${serverUrl}/task/list?botToken=${config.TELEGRAM_TOKEN}`);
+    const filterData = data.tasks.filter(e => e.linkType === linkType);
+
+    if (text) {
+      filterData.forEach(el => {
+        const msg = {
+          text,
+          targetChatId: el.groupInfo.id,
+          maniChannelName: el.channelName,
+          isEuOrgLink: false,
+          isNewMdisk: false
+        };
+        pushInMessageQueue({
+          msg,
+          mode: iMode.DBMESSAGESENDER
+        });
+      });
+    }
+
+    res.json({
+      error: false,
+      msg: text ? "Sucess" : "No text found"
+    });
+  } catch (e) {
+    Logger.error(e.message || "tasklist error occured");
+    res.json({
+      error: true,
+      errorMessage: e.message
+    });
+  }
+});
 router.get("/telegramget", async (req, res) => {
   try {
     const {

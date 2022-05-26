@@ -21,6 +21,10 @@ const {
   Logger
 } = require("../utils/winston");
 
+const {
+  setKeepliveTime
+} = require("../utils/keepalive");
+
 const api = config.SEARCH_SITE || "https://torrent-aio-bot.herokuapp.com/";
 console.log("Using api: ", api);
 let activeMode = parseInt(config.DEFAULT_MODE) || 6;
@@ -88,6 +92,7 @@ const helpText = `You can control me by sending these commands:
 /getcategory - get active category
 /setlinktype - main site used
 /getprocessstats - process stats
+/sleep - Bot sleep in heroku time
 /help - Get help info \n
         "𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
 
@@ -116,6 +121,10 @@ function bot(torrent, bot) {
   });
   bot.onText(/\/help/, async msg => {
     bot.sendMessage(msg.chat.id, helpText);
+  });
+  bot.onText(/\/sleep/, async msg => {
+    setKeepliveTime(0);
+    bot.sendMessage(msg.chat.id, "Bot will sleep in heroku sleep min");
   });
   bot.onText(/\/getprocessstats/, async msg => {
     bot.sendMessage(msg.chat.id, JSON.stringify(getProcessStats(), null, 4));

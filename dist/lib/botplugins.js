@@ -111,7 +111,11 @@ const removeUsername = (str, maniChannelName = config.CHANNEL) => {
           return el.replace(/@.[a-zA-Z0-9_-]*/g, channelName);
         }
       } else if (el.includes("t.me") || el.includes("telegra.ph")) {
-        return channelName;
+        if (el.lastIndexOf("/") >= 0) {
+          return el.slice(0, el.lastIndexOf("/") + 1) + maniChannelName;
+        } else {
+          return channelName;
+        }
       }
 
       return el;
@@ -428,21 +432,25 @@ const processMessages = async bot => {
               cloudinaryUrl
             } = msg;
             await sleep(7000);
-            const clStrTemp = isNewMdisk ? await multiLinkCon(msg.text, iMode.MDISK, maniChannelName) : msg.text;
-            const clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
+            let clStr = removeUsername(msg.text, maniChannelName);
+            const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
+            clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
               caption: clStr
             };
-            opts["reply_markup"] = {
-              inline_keyboard: [[{
-                text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
-                url: `https://t.me/${maniChannelName}`
-              }]]
-            };
+
+            if (additionalAction) {
+              opts["reply_markup"] = {
+                inline_keyboard: [[{
+                  text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
+                  url: `https://t.me/${maniChannelName}`
+                }]]
+              };
+            }
 
             if (thumbUrl || imgDriveId || cloudinaryUrl) {
               const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
-              imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${Math.random().toFixed(1)}` : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
+              imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${(Math.random() * 100).toFixed(1)}` : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
 
               console.log("imageUrl##", imageUrl);
               const sendData = await bot.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);

@@ -7,8 +7,12 @@ const config = require("../config");
 const humanTime = require("./humanTime");
 
 const KEEPLIVE_SITE = `${config.SERVER_SITE}/keepalive`;
-const KEEPLIVE_TIME = config.KEEPLIVE_TIME || 80;
+let KEEPLIVE_TIME = config.KEEPLIVE_TIME || 80;
 const KEEPLIVE_INTERVAL = config.KEEPLIVE_INTERVAL || 280000;
+
+function setKeepliveTime(minutes = 0) {
+  KEEPLIVE_TIME = minutes;
+}
 
 function addMinutes(date, minutes) {
   return new Date(date.getTime() + minutes * 60000);
@@ -51,5 +55,6 @@ function keepalive() {
 module.exports = {
   keepalive,
   updateLastRequestTime,
-  lastRequestTime
+  lastRequestTime,
+  setKeepliveTime
 };
