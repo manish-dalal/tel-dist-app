@@ -6,7 +6,9 @@ const {
   google
 } = require("googleapis");
 
-const logger = require("./logger");
+const {
+  Logger: logger
+} = require("./winston");
 
 const config = require("../config");
 
@@ -23,30 +25,30 @@ if (GDRIVE_TOKEN) {
   try {
     parsedToken = JSON.parse(GDRIVE_TOKEN);
   } catch (e) {
-    logger("GDRIVE_TOKEN env not correctGDRIVE_TOKEN set to:", GDRIVE_TOKEN);
+    logger.info("GDRIVE_TOKEN env not correctGDRIVE_TOKEN set to:", GDRIVE_TOKEN);
   }
 }
 
 const SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.file"];
 
 if (!CLIENT_ID) {
-  logger("CLIENT_ID env not set. Not uploading to gdrive.");
+  logger.info("CLIENT_ID env not set. Not uploading to gdrive.");
 }
 
 if (!CLIENT_SECRET) {
-  logger("CLIENT_SECRET env not set. Not uploading to gdrive.");
+  logger.info("CLIENT_SECRET env not set. Not uploading to gdrive.");
 }
 
 if (!AUTH_CODE) {
-  logger("AUTH_CODE env not set.");
+  logger.info("AUTH_CODE env not set.");
 }
 
 if (!GDRIVE_TOKEN) {
-  logger("GDRIVE_TOKEN env not set.");
+  logger.info("GDRIVE_TOKEN env not set.");
 }
 
 if (GDRIVE_PARENT_FOLDER) {
-  logger(`GDRIVE_PARENT_FOLDER set to ${GDRIVE_PARENT_FOLDER}`);
+  logger.info(`GDRIVE_PARENT_FOLDER set to ${GDRIVE_PARENT_FOLDER}`);
 }
 
 let auth = null;
@@ -60,7 +62,7 @@ if (CLIENT_ID && CLIENT_SECRET) {
       version: "v3",
       auth
     });
-    logger("Gdrive client up");
+    logger.info("Gdrive client up");
   });
 }
 
@@ -72,7 +74,7 @@ async function authorize() {
       access_type: "offline",
       scope: SCOPES
     });
-    logger(`Get AUTH_CODE env by visiting this url: \n${authUrl}\n`);
+    logger.info(`Get AUTH_CODE env by visiting this url: \n${authUrl}\n`);
     return null;
   } else if (AUTH_CODE && !GDRIVE_TOKEN) {
     return oAuth2Client.getToken(AUTH_CODE, (err, token) => {
@@ -82,15 +84,15 @@ async function authorize() {
       }
 
       oAuth2Client.setCredentials(token);
-      if (!GDRIVE_TOKEN) logger("Set GDRIVE_TOKEN env to:\n", JSON.stringify(token));else logger("Gdrive config OK.");
+      if (!GDRIVE_TOKEN) logger.info("Set GDRIVE_TOKEN env to:\n", JSON.stringify(token));else logger.info("Gdrive config OK.");
       return oAuth2Client;
     });
   } else if (AUTH_CODE && GDRIVE_TOKEN) {
     oAuth2Client.setCredentials(parsedToken);
     return oAuth2Client;
   } else {
-    logger("AUTH_CODE:", !!AUTH_CODE);
-    logger("GDRIVE_TOKEN:", !!GDRIVE_TOKEN);
+    logger.info("AUTH_CODE:", !!AUTH_CODE);
+    logger.info("GDRIVE_TOKEN:", !!GDRIVE_TOKEN);
   }
 }
 

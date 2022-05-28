@@ -39,6 +39,10 @@ const task = require("./routes/task");
 
 const config = require("./config");
 
+const {
+  Logger: logger
+} = require("./utils/winston");
+
 const dev = config.NODE_ENV !== "production";
 const allowWeb = !config.DISABLE_WEB;
 const PORT = parseInt(config.PORT, 10) || 5000;
@@ -148,4 +152,5 @@ if (allowWeb) {
 
 server.listen(PORT, () => {
   console.log(`> Running on http://localhost:${PORT}`);
+  logger.info("Server running...");
 });
