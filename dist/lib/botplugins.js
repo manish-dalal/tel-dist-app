@@ -436,7 +436,7 @@ const processMessages = async bot => {
             const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
             clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
-              caption: clStr
+              caption: clStr.slice(0, 1025)
             };
 
             if (additionalAction) {

@@ -388,7 +388,15 @@ function bot(torrent, bot) {
   bot.on("message", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
-    Logger.info(JSON.stringify({ ...(msg === null || msg === void 0 ? void 0 : msg.from)
+    const {
+      from,
+      text,
+      caption
+    } = msg;
+    Logger.info(JSON.stringify({
+      from,
+      text,
+      caption
     }));
 
     if (!(msg.text && msg.text.startsWith("/"))) {
