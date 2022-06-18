@@ -400,14 +400,23 @@ const processMessages = async bot => {
         } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER) {
           const convertedStr = await multiLinkCon(msg.caption || msg.text, mode);
 
-          if (msg.photo && convertedStr) {
+          if ((msg.document || msg.video || msg.audio || msg.photo) && convertedStr) {
             const {
               fileId
             } = getFileData(msg);
             const opts = {
               caption: convertedStr
             };
-            await bot.sendPhoto(chatId, fileId, opts);
+
+            if (msg.document) {
+              await bot.sendDocument(chatId, fileId, opts);
+            } else if (msg.video) {
+              await bot.sendVideo(chatId, fileId, opts);
+            } else if (msg.audio) {
+              await bot.sendAudio(chatId, fileId, opts);
+            } else if (msg.photo) {
+              await bot.sendPhoto(chatId, fileId, opts);
+            }
           } else if (msg.text && convertedStr) {
             await bot.sendMessage(chatId, convertedStr);
           }
