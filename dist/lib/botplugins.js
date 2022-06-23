@@ -184,6 +184,7 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       return "";
     }
   } catch (error) {
+    Logger.error(error.message || "mdiskUp error occured");
     return "";
   }
 };
@@ -245,6 +246,7 @@ const duplicateFinder = async link => {
 
     return u_url;
   } catch (error) {
+    console.log("error", error);
     return "";
   }
 };
