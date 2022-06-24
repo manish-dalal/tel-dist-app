@@ -178,7 +178,7 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
 
       const filecode = _.get(res, "data.result.filecode", _.get(res, "data.msg", ""));
 
-      const newLink = "https://dood.sh/d/" + filecode;
+      const newLink = filecode === "No file" ? "https://dood.sh/d/" + filecode : "";
       return newLink;
     } else {
       return "";
