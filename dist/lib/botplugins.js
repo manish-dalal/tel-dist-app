@@ -173,8 +173,7 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       return newLink;
     } else if (link.includes("doo") && config.DOODSTREAM_API_KEY) {
       const reqUrl = `https://doodapi.com/api/upload/url?key=${config.DOODSTREAM_API_KEY}&url=${link}`;
-      const res = await axios.get(reqUrl);
-      console.log("Doodstream data", res.data);
+      const res = await axios.get(reqUrl); // console.log("Doodstream data", res.data);
 
       const filecode = _.get(res, "data.result.filecode", _.get(res, "data.msg", ""));
 
