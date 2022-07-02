@@ -6,13 +6,14 @@ const config = require("../config");
 
 const humanTime = require("./humanTime");
 
-const KEEPLIVE_SITE = `${config.SERVER_SITE}/keepalive`;
-let KEEPLIVE_TIME = config.KEEPLIVE_TIME || 100;
-const KEEPLIVE_INTERVAL = config.KEEPLIVE_INTERVAL || 280000;
+const {
+  getProcessStats
+} = require("../lib/botplugins");
 
-function setKeepliveTime(minutes = 0) {
-  KEEPLIVE_TIME = minutes;
-}
+const KEEPLIVE_SITE = `${config.SERVER_SITE}/keepalive`; // let KEEPLIVE_TIME = config.KEEPLIVE_TIME || 100;
+
+const KEEPLIVE_INTERVAL = config.KEEPLIVE_INTERVAL || 280000;
+let LAST_KEEPLIVE_TIME = new Date();
 
 function addMinutes(date, minutes) {
   return new Date(date.getTime() + minutes * 60000);
@@ -27,13 +28,19 @@ const updateLastRequestTime = () => {
 function keepalive() {
   if (KEEPLIVE_SITE) {
     setInterval(async () => {
+      const {
+        total = 0,
+        current = 0,
+        nextData = 0
+      } = getProcessStats();
       const currentTime = new Date().getTime();
-      const nextSleepTime = addMinutes(lastRequestTime, KEEPLIVE_TIME).getTime();
       const afterLastRequestTime = addMinutes(lastRequestTime, 4).getTime();
-      console.log("Bot will sleep after", humanTime(nextSleepTime - currentTime));
-      console.log(`Last rquest is not ${KEEPLIVE_TIME} min ago`, nextSleepTime > currentTime, currentTime > afterLastRequestTime);
+      console.log("Last keeplive request is", humanTime(currentTime - LAST_KEEPLIVE_TIME.getTime()));
+      console.log("Bot last request is", humanTime(currentTime - lastRequestTime.getTime()));
+      console.log(`condition 1`, total - current > 10, "===", nextData);
+      console.log(`condition 2`, currentTime > afterLastRequestTime);
 
-      if (nextSleepTime > currentTime && currentTime > afterLastRequestTime) {
+      if ((total - current > 10 || nextData) && currentTime > afterLastRequestTime) {
         try {
           let params = {
             url: config.SITE
@@ -41,6 +48,7 @@ function keepalive() {
           const url = new URL(KEEPLIVE_SITE);
           url.search = new URLSearchParams(params);
           const data = await axios(url.href);
+          LAST_KEEPLIVE_TIME = new Date();
           console.log("keep alive triggred, status: ", data.status);
         } catch (error) {
           console.log("Error in ", KEEPLIVE_SITE);
@@ -55,6 +63,5 @@ function keepalive() {
 module.exports = {
   keepalive,
   updateLastRequestTime,
-  lastRequestTime,
-  setKeepliveTime
+  lastRequestTime
 };
