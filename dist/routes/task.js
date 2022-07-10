@@ -190,7 +190,8 @@ router.get("/backupMessage", async (req, res) => {
 
     const {
       linkType,
-      text = defaultText
+      text = defaultText,
+      thumbUrl = ""
     } = req.query;
     const {
       data
@@ -204,7 +205,8 @@ router.get("/backupMessage", async (req, res) => {
           targetChatId: el.groupInfo.id,
           maniChannelName: el.channelName,
           isEuOrgLink: false,
-          isNewMdisk: false
+          isNewMdisk: false,
+          thumbUrl
         };
         pushInMessageQueue({
           msg,
