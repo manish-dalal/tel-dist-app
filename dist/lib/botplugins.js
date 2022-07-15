@@ -191,7 +191,7 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
 const newCoinLink = link => {
   const linkArr = link.split("/");
   const v_id = linkArr[linkArr.length - 1];
-  const converted_link = link.includes("mdisk.me") ? `https://mdisk.eu.org/${v_id}` : `https://dood.co.in/${v_id}`;
+  const converted_link = link.includes("mdisk.me") ? `https://mdisk.eu.org/${v_id}` : `https://dood.eu.org/${v_id}`;
   return converted_link;
 };
 
