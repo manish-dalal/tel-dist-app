@@ -5,7 +5,7 @@ const defaultValue = dev ? require("./config.dev") : {};
 const config = {
   DISABLE_WEB: process.env.DISABLE_WEB,
   SEARCH_SITE: process.env.SEARCH_SITE || defaultValue.SEARCH_SITE,
-  SERVER_SITE: process.env.SERVER_SITE || defaultValue.SERVER_SITE || "https://admin-mdisk.glitch.me/api",
+  SERVER_SITE: process.env.SERVER_SITE || defaultValue.SERVER_SITE || "https://diskuploader.herokuapp.com/api",
   AUTH_CODE: process.env.AUTH_CODE || defaultValue.AUTH_CODE,
   CLIENT_ID: process.env.CLIENT_ID || defaultValue.CLIENT_ID,
   CLIENT_SECRET: process.env.CLIENT_SECRET || defaultValue.CLIENT_SECRET,
