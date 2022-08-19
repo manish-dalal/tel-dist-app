@@ -91,7 +91,11 @@ const sleep = ms => {
 };
 
 const removeUsername = (str, maniChannelName = config.CHANNEL) => {
-  const channelName = "@" + maniChannelName;
+  if (maniChannelName == "null") {
+    return str;
+  }
+
+  const channelName = !maniChannelName ? "" : "@" + maniChannelName;
   const newStr = replaceTextArr.reduce((ac = "", cu) => {
     const re = new RegExp(cu, "gi");
     return ac.replace(re, "");
