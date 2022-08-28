@@ -8,6 +8,8 @@ const Torrent = require("../lib/torrent");
 
 const botInit = require("../lib/bot");
 
+const botMethods = require("../lib/botMethods");
+
 const config = require("../config");
 
 const {
@@ -33,6 +35,7 @@ if (site && token) {
   });
   bot.setWebHook(`${site}api/v1/torrent/bot`);
   botInit(torrent, bot);
+  botMethods.setBot(bot);
   console.log("Bot ready");
 }
 

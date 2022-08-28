@@ -37,6 +37,8 @@ const torrent = require("./routes/torrent");
 
 const task = require("./routes/task");
 
+const joinRequests = require("./routes/joinRequests");
+
 const config = require("./config");
 
 const {
@@ -125,6 +127,7 @@ server.use("/api/v1/torrent", torrent);
 server.use("/api/v1/search", search);
 server.use("/api/v1/details", details);
 server.use("/api/v1/task", task);
+server.use("/api/v1/chatjoin", joinRequests);
 server.get("/api/v1/uptime", async (req, res) => {
   res.send({
     uptime: humanTime(process.uptime() * 1000)
