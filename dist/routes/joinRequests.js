@@ -6,6 +6,8 @@ const config = require("../config");
 
 const axios = require("axios");
 
+const set = require("lodash/set");
+
 const {
   Logger
 } = require("../utils/winston");
@@ -17,7 +19,7 @@ const router = express.Router();
 const apiUrl = `${MONGO_API_URL}/joinrequest`;
 router.post("/all", async (req, res) => {
   const body = req.body;
-  body["data"]["token"] = config.TELEGRAM_TOKEN;
+  set(body, "data.token", config.TELEGRAM_TOKEN);
   const {
     data
   } = await axios.post(apiUrl, body);
