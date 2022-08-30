@@ -78,6 +78,33 @@ router.post("/approve", async (req, res) => {
     data
   });
 });
+router.post("/approveandclear", async (req, res) => {
+  const body = req.body;
+  const {
+    requests = []
+  } = body;
+  const newIds = [];
+
+  for (const request of requests) {
+    try {
+      newIds.push({
+        $oid: request._id
+      });
+      const res = await botMethods.approveChatJoinRequest(request.chat.id, request.from.id);
+    } catch (error) {
+      Logger.error("Error approve chat requests", error.message);
+    }
+  }
+
+  const {
+    data
+  } = await deleteRequests(newIds);
+  res.send({
+    error: false,
+    message: "success",
+    data
+  });
+});
 router.post("/reject", async (req, res) => {
   const body = req.body;
   const {
