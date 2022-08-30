@@ -41,10 +41,10 @@ const deleteRequests = async (ids = []) => {
   const newBody = {
     action: "remove",
     data: {
-      ids
+      ids,
+      token: config.TELEGRAM_TOKEN
     }
   };
-  newBody["data"]["token"] = config.TELEGRAM_TOKEN;
   const res = await axios.post(apiUrl, newBody);
   return res;
 };
