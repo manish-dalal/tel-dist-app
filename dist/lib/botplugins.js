@@ -91,9 +91,8 @@ const sleep = ms => {
 };
 
 const removeUsername = (str, maniChannelName = config.CHANNEL) => {
-  console.log("maniChannelName", maniChannelName);
-
-  if (maniChannelName == "null") {
+  // console.log("dddffff", _.get(config, "REMOVE_CHANNEL_NAME", true));
+  if (!_.get(config, "REMOVE_CHANNEL_NAME", true)) {
     return str;
   }
 

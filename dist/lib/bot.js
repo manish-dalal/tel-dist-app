@@ -26,6 +26,14 @@ console.log("Using api: ", api);
 let activeMode = parseInt(config.DEFAULT_MODE) || 6;
 let activeCategory = parseInt(config.DEFAULT_CATEGORY) || 1;
 let activeLinkType = config.ACTIVE_LINK_TYPE || "mdisk";
+const adminUsersArr = JSON.parse(config.ADMIN_USERS);
+
+const checkUser = (action, msg) => {
+  if (!adminUsersArr.length || adminUsersArr.includes(msg.from.id)) {
+    action();
+  }
+};
+
 const searchRegex = /\/search (piratebay|limetorrent|1337x) (.+)/;
 const detailsRegex = /\/details (piratebay|limetorrent|1337x) (.+)/;
 const downloadRegex = /\/download (.+)/;
@@ -111,275 +119,305 @@ function bot(torrent, bot) {
     }
   });
   bot.onText(/\/start/, async msg => {
-    bot.sendMessage(msg.chat.id, config.CHANNEL ? newStartText(msg) : startMessage, {
-      parse_mode: "Markdown"
-    });
+    checkUser(() => {
+      bot.sendMessage(msg.chat.id, config.CHANNEL ? newStartText(msg) : startMessage, {
+        parse_mode: "Markdown"
+      });
+    }, msg);
   });
   bot.onText(/\/help/, async msg => {
-    bot.sendMessage(msg.chat.id, helpText);
+    checkUser(() => {
+      bot.sendMessage(msg.chat.id, helpText);
+    }, msg);
   });
   bot.onText(/\/getprocessstats/, async msg => {
-    bot.sendMessage(msg.chat.id, JSON.stringify(getProcessStats(), null, 4));
+    checkUser(() => {
+      bot.sendMessage(msg.chat.id, JSON.stringify(getProcessStats(), null, 4));
+    }, msg);
   });
   bot.onText(getcategoryRegex, async (msg, match) => {
-    console.log("getcategoryRegex msg", JSON.stringify(msg));
-    console.log("match", JSON.stringify(match));
-    const from = msg.chat.id;
-    bot.sendMessage(from, `Active category = ${activeCategory}`);
+    checkUser(() => {
+      console.log("getcategoryRegex msg", JSON.stringify(msg));
+      console.log("match", JSON.stringify(match));
+      const from = msg.chat.id;
+      bot.sendMessage(from, `Active category = ${activeCategory}`);
+    }, msg);
   });
   bot.onText(setlinktypeRegex, async (msg, match) => {
-    const from = msg.chat.id;
-    var keyboard = {
-      inline_keyboard: [[{
-        text: "Mdisk",
-        callback_data: "mdisk"
-      }, {
-        text: "Doodstream",
-        callback_data: "dood"
-      }]]
-    };
-    const opts = {
-      reply_markup: JSON.stringify(keyboard)
-    };
-    bot.sendMessage(from, match[1], opts);
+    checkUser(() => {
+      const from = msg.chat.id;
+      var keyboard = {
+        inline_keyboard: [[{
+          text: "Mdisk",
+          callback_data: "mdisk"
+        }, {
+          text: "Doodstream",
+          callback_data: "dood"
+        }]]
+      };
+      const opts = {
+        reply_markup: JSON.stringify(keyboard)
+      };
+      bot.sendMessage(from, match[1], opts);
+    }, msg);
   });
   bot.onText(setcategoryRegex, async (msg, match) => {
-    const from = msg.chat.id;
-    var keyboard = {
-      inline_keyboard: [[{
-        text: "Webseries",
-        callback_data: 1
-      }, {
-        text: "English",
-        callback_data: 2
-      }], [{
-        text: "English Premium",
-        callback_data: 3
-      }, {
-        text: "Desi",
-        callback_data: 4
-      }], [{
-        text: "English Bulk",
-        callback_data: 5
-      }, {
-        text: "Tango&onlyfans",
-        callback_data: 6
-      }]]
-    };
-    const opts = {
-      reply_markup: JSON.stringify(keyboard)
-    };
-    bot.sendMessage(from, match[1], opts);
+    checkUser(() => {
+      const from = msg.chat.id;
+      var keyboard = {
+        inline_keyboard: [[{
+          text: "Webseries",
+          callback_data: 1
+        }, {
+          text: "English",
+          callback_data: 2
+        }], [{
+          text: "English Premium",
+          callback_data: 3
+        }, {
+          text: "Desi",
+          callback_data: 4
+        }], [{
+          text: "English Bulk",
+          callback_data: 5
+        }, {
+          text: "Tango&onlyfans",
+          callback_data: 6
+        }]]
+      };
+      const opts = {
+        reply_markup: JSON.stringify(keyboard)
+      };
+      bot.sendMessage(from, match[1], opts);
+    }, msg);
   });
   bot.onText(getmodeRegex, async (msg, match) => {
-    const from = msg.chat.id;
-    bot.sendMessage(from, `Active Mode = ${activeMode}`);
+    checkUser(() => {
+      const from = msg.chat.id;
+      bot.sendMessage(from, `Active Mode = ${activeMode}`);
+    }, msg);
   });
   bot.onText(setmodeRegex, async (msg, match) => {
-    const from = msg.chat.id;
-    var keyboard = {
-      inline_keyboard: [[{
-        text: "Add Thumb Image",
-        callback_data: iMode.THUMB
-      }, {
-        text: "Channel Name Updater",
-        callback_data: iMode.CHANNELREMOVER
-      }], [{
-        text: "co.in link",
-        callback_data: iMode.COIN
-      }, {
-        text: "Mdisk/Dood link",
-        callback_data: iMode.MDISK
-      }], [{
-        text: "Duplicate Link Remover",
-        callback_data: iMode.DUPLICATE
-      }, {
-        text: "Mdisk/Dood + Duplicate",
-        callback_data: iMode.MDISKDUPLICATE
-      }], [{
-        text: "Message in DB",
-        callback_data: iMode.SAVEDB
-      }, {
-        text: "Get Message info",
-        callback_data: iMode.MESSAGEINFO
-      }]]
-    };
-    const opts = {
-      reply_markup: JSON.stringify(keyboard)
-    };
-    bot.sendMessage(from, match[1], opts);
+    checkUser(() => {
+      const from = msg.chat.id;
+      var keyboard = {
+        inline_keyboard: [[{
+          text: "Add Thumb Image",
+          callback_data: iMode.THUMB
+        }, {
+          text: "Channel Name Updater",
+          callback_data: iMode.CHANNELREMOVER
+        }], [{
+          text: "co.in link",
+          callback_data: iMode.COIN
+        }, {
+          text: "Mdisk/Dood link",
+          callback_data: iMode.MDISK
+        }], [{
+          text: "Duplicate Link Remover",
+          callback_data: iMode.DUPLICATE
+        }, {
+          text: "Mdisk/Dood + Duplicate",
+          callback_data: iMode.MDISKDUPLICATE
+        }], [{
+          text: "Message in DB",
+          callback_data: iMode.SAVEDB
+        }, {
+          text: "Get Message info",
+          callback_data: iMode.MESSAGEINFO
+        }]]
+      };
+      const opts = {
+        reply_markup: JSON.stringify(keyboard)
+      };
+      bot.sendMessage(from, match[1], opts);
+    }, msg);
   });
   bot.onText(/\/server diskinfo (.+)/, async (msg, match) => {
-    const from = msg.chat.id;
-    const path = match[1];
-    const info = await diskinfo(path);
-    bot.sendMessage(from, info);
+    checkUser(async () => {
+      const from = msg.chat.id;
+      const path = match[1];
+      const info = await diskinfo(path);
+      bot.sendMessage(from, info);
+    }, msg);
   });
   bot.onText(/\/server uptime/, async msg => {
-    const from = msg.chat.id;
-    bot.sendMessage(from, humanTime(process.uptime() * 1000));
+    checkUser(() => {
+      const from = msg.chat.id;
+      bot.sendMessage(from, humanTime(process.uptime() * 1000));
+    }, msg);
   });
   bot.onText(/\/server status/, async msg => {
-    const from = msg.chat.id;
-    const currStatus = await status();
-    bot.sendMessage(from, currStatus);
+    checkUser(async () => {
+      const from = msg.chat.id;
+      const currStatus = await status();
+      bot.sendMessage(from, currStatus);
+    }, msg);
   });
   bot.onText(searchRegex, async (msg, match) => {
-    var from = msg.from.id;
-    var site = match[1];
-    var query = match[2];
-    bot.sendMessage(from, "Searching...");
-    const data = await axios(`${api}api/v1/search/${site}?query=${query}`).then(({
-      data
-    }) => data);
+    checkUser(async () => {
+      var from = msg.from.id;
+      var site = match[1];
+      var query = match[2];
+      bot.sendMessage(from, "Searching...");
+      const data = await axios(`${api}api/v1/search/${site}?query=${query}`).then(({
+        data
+      }) => data);
 
-    if (!data || data.error) {
-      bot.sendMessage(from, "An error occured on server");
-    } else if (!data.results || data.results.length === 0) {
-      bot.sendMessage(from, "No results found.");
-    } else if (data.results.length > 0) {
-      let results1 = "";
-      let results2 = "";
-      let results3 = "";
-      data.results.forEach((result, i) => {
-        if (i <= 2) {
-          results1 += `Name: ${result.name} \nSeeds: ${result.seeds} \nDetails: ${result.details} \nLink: ${result.link} \n\n`;
-        } else if (2 < i && i <= 5) {
-          results2 += `Name: ${result.name} \nSeeds: ${result.seeds} \nDetails: ${result.details} \nLink: ${result.link} \n\n`;
-        } else if (5 < i && i <= 8) {
-          results3 += `Name: ${result.name} \nSeeds: ${result.seeds} \nDetails: ${result.details} \nLink: ${result.link} \n\n`;
-        }
-      });
-      bot.sendMessage(from, results1);
-      bot.sendMessage(from, results2);
-      bot.sendMessage(from, results3);
-    }
+      if (!data || data.error) {
+        bot.sendMessage(from, "An error occured on server");
+      } else if (!data.results || data.results.length === 0) {
+        bot.sendMessage(from, "No results found.");
+      } else if (data.results.length > 0) {
+        let results1 = "";
+        let results2 = "";
+        let results3 = "";
+        data.results.forEach((result, i) => {
+          if (i <= 2) {
+            results1 += `Name: ${result.name} \nSeeds: ${result.seeds} \nDetails: ${result.details} \nLink: ${result.link} \n\n`;
+          } else if (2 < i && i <= 5) {
+            results2 += `Name: ${result.name} \nSeeds: ${result.seeds} \nDetails: ${result.details} \nLink: ${result.link} \n\n`;
+          } else if (5 < i && i <= 8) {
+            results3 += `Name: ${result.name} \nSeeds: ${result.seeds} \nDetails: ${result.details} \nLink: ${result.link} \n\n`;
+          }
+        });
+        bot.sendMessage(from, results1);
+        bot.sendMessage(from, results2);
+        bot.sendMessage(from, results3);
+      }
+    }, msg);
   });
   bot.onText(detailsRegex, async (msg, match) => {
-    var from = msg.from.id;
-    var site = match[1];
-    var query = match[2];
-    bot.sendMessage(from, "Loading...");
-    const data = await axios(`${api}/details/${site}?query=${query}`).then(({
-      data
-    }) => data);
+    checkUser(async () => {
+      var from = msg.from.id;
+      var site = match[1];
+      var query = match[2];
+      bot.sendMessage(from, "Loading...");
+      const data = await axios(`${api}/details/${site}?query=${query}`).then(({
+        data
+      }) => data);
 
-    if (!data || data.error) {
-      bot.sendMessage(from, "An error occured");
-    } else if (data.torrent) {
-      const torrent = data.torrent;
-      let result1 = "";
-      let result2 = "";
-      result1 += `Title: ${torrent.title} \n\nInfo: ${torrent.info}`;
-      torrent.details.forEach(item => {
-        result2 += `${item.infoTitle} ${item.infoText} \n\n`;
-      });
-      result2 += "Magnet Link:";
-      await bot.sendMessage(from, result1);
-      await bot.sendMessage(from, result2);
-      await bot.sendMessage(from, torrent.downloadLink);
-    }
+      if (!data || data.error) {
+        bot.sendMessage(from, "An error occured");
+      } else if (data.torrent) {
+        const torrent = data.torrent;
+        let result1 = "";
+        let result2 = "";
+        result1 += `Title: ${torrent.title} \n\nInfo: ${torrent.info}`;
+        torrent.details.forEach(item => {
+          result2 += `${item.infoTitle} ${item.infoText} \n\n`;
+        });
+        result2 += "Magnet Link:";
+        await bot.sendMessage(from, result1);
+        await bot.sendMessage(from, result2);
+        await bot.sendMessage(from, torrent.downloadLink);
+      }
+    }, msg);
   });
   bot.onText(downloadRegex, (msg, match) => {
-    var from = msg.from.id;
-    var link = match[1];
-    let messageObj = null;
-    let torrInterv = null;
+    checkUser(async () => {
+      var from = msg.from.id;
+      var link = match[1];
+      let messageObj = null;
+      let torrInterv = null;
 
-    const reply = async torr => {
-      let mess1 = "";
-      mess1 += `Name: ${torr.name}\n\n`;
-      mess1 += `Status: ${torr.status}\n\n`;
-      mess1 += `Size: ${torr.total}\n\n`;
+      const reply = async torr => {
+        let mess1 = "";
+        mess1 += `Name: ${torr.name}\n\n`;
+        mess1 += `Status: ${torr.status}\n\n`;
+        mess1 += `Size: ${torr.total}\n\n`;
 
-      if (!torr.done) {
-        mess1 += `Downloaded: ${torr.downloaded}\n\n`;
-        mess1 += `Speed: ${torr.speed}\n\n`;
-        mess1 += `Progress: ${torr.progress}%\n\n`;
-        mess1 += `Time Remaining: ${torr.redableTimeRemaining}\n\n`;
+        if (!torr.done) {
+          mess1 += `Downloaded: ${torr.downloaded}\n\n`;
+          mess1 += `Speed: ${torr.speed}\n\n`;
+          mess1 += `Progress: ${torr.progress}%\n\n`;
+          mess1 += `Time Remaining: ${torr.redableTimeRemaining}\n\n`;
+        } else {
+          mess1 += `Link: ${torr.downloadLink}\n\n`;
+          clearInterval(torrInterv);
+          torrInterv = null;
+        }
+
+        mess1 += `Magnet URI: ${torr.magnetURI}`;
+
+        try {
+          if (messageObj) {
+            if (messageObj.text !== mess1) bot.editMessageText(mess1, {
+              chat_id: messageObj.chat.id,
+              message_id: messageObj.message_id
+            });
+          } else messageObj = await bot.sendMessage(from, mess1);
+        } catch (e) {
+          console.log(e.message);
+        }
+      };
+
+      const onDriveUpload = (torr, url) => bot.sendMessage(from, `${torr.name} uploaded to drive\n${url}`);
+
+      const onDriveUploadStart = torr => bot.sendMessage(from, `Uploading ${torr.name} to gdrive`);
+
+      if (link.indexOf("magnet:") !== 0) {
+        bot.sendMessage(from, "Link is not a magnet link");
       } else {
-        mess1 += `Link: ${torr.downloadLink}\n\n`;
-        clearInterval(torrInterv);
-        torrInterv = null;
+        bot.sendMessage(from, "Starting download...");
+
+        try {
+          const torren = torrent.download(link, torr => reply(torr), torr => reply(torr), onDriveUpload, onDriveUploadStart);
+          torrInterv = setInterval(() => reply(torrent.statusLoader(torren)), 5000);
+        } catch (e) {
+          bot.sendMessage(from, "An error occured\n" + e.message);
+        }
       }
-
-      mess1 += `Magnet URI: ${torr.magnetURI}`;
-
-      try {
-        if (messageObj) {
-          if (messageObj.text !== mess1) bot.editMessageText(mess1, {
-            chat_id: messageObj.chat.id,
-            message_id: messageObj.message_id
-          });
-        } else messageObj = await bot.sendMessage(from, mess1);
-      } catch (e) {
-        console.log(e.message);
-      }
-    };
-
-    const onDriveUpload = (torr, url) => bot.sendMessage(from, `${torr.name} uploaded to drive\n${url}`);
-
-    const onDriveUploadStart = torr => bot.sendMessage(from, `Uploading ${torr.name} to gdrive`);
-
-    if (link.indexOf("magnet:") !== 0) {
-      bot.sendMessage(from, "Link is not a magnet link");
-    } else {
-      bot.sendMessage(from, "Starting download...");
-
-      try {
-        const torren = torrent.download(link, torr => reply(torr), torr => reply(torr), onDriveUpload, onDriveUploadStart);
-        torrInterv = setInterval(() => reply(torrent.statusLoader(torren)), 5000);
-      } catch (e) {
-        bot.sendMessage(from, "An error occured\n" + e.message);
-      }
-    }
+    }, msg);
   });
   bot.onText(statusRegex, (msg, match) => {
-    var from = msg.from.id;
-    var link = match[1];
-    const torr = torrent.get(link);
+    checkUser(() => {
+      var from = msg.from.id;
+      var link = match[1];
+      const torr = torrent.get(link);
 
-    if (link.indexOf("magnet:") !== 0) {
-      bot.sendMessage(from, "Link is not a magnet link");
-    } else if (!torr) {
-      bot.sendMessage(from, "Not downloading please add");
-    } else {
-      let mess1 = "";
-      mess1 += `Name: ${torr.name}\n\n`;
-      mess1 += `Status: ${torr.status}\n\n`;
-      mess1 += `Size: ${torr.total}\n\n`;
-
-      if (!torr.done) {
-        mess1 += `Downloaded: ${torr.downloaded}\n\n`;
-        mess1 += `Speed: ${torr.speed}\n\n`;
-        mess1 += `Progress: ${torr.progress}\n\n`;
-        mess1 += `Time Remaining: ${torr.redableTimeRemaining}\n\n`;
+      if (link.indexOf("magnet:") !== 0) {
+        bot.sendMessage(from, "Link is not a magnet link");
+      } else if (!torr) {
+        bot.sendMessage(from, "Not downloading please add");
       } else {
-        mess1 += `Link: ${torr.downloadLink}\n\n`;
-      }
+        let mess1 = "";
+        mess1 += `Name: ${torr.name}\n\n`;
+        mess1 += `Status: ${torr.status}\n\n`;
+        mess1 += `Size: ${torr.total}\n\n`;
 
-      mess1 += `Magnet URI: ${torr.magnetURI}`;
-      bot.sendMessage(from, mess1);
-    }
+        if (!torr.done) {
+          mess1 += `Downloaded: ${torr.downloaded}\n\n`;
+          mess1 += `Speed: ${torr.speed}\n\n`;
+          mess1 += `Progress: ${torr.progress}\n\n`;
+          mess1 += `Time Remaining: ${torr.redableTimeRemaining}\n\n`;
+        } else {
+          mess1 += `Link: ${torr.downloadLink}\n\n`;
+        }
+
+        mess1 += `Magnet URI: ${torr.magnetURI}`;
+        bot.sendMessage(from, mess1);
+      }
+    }, msg);
   });
   bot.onText(removeRegex, (msg, match) => {
-    var from = msg.from.id;
-    var link = match[1];
+    checkUser(() => {
+      var from = msg.from.id;
+      var link = match[1];
 
-    try {
-      torrent.remove(link);
-      bot.sendMessage(from, "Removed");
-    } catch (e) {
-      bot.sendMessage(from, `${e.message}`);
-    }
+      try {
+        torrent.remove(link);
+        bot.sendMessage(from, "Removed");
+      } catch (e) {
+        bot.sendMessage(from, `${e.message}`);
+      }
+    }, msg);
   });
   setInterval(async () => {
     // console.log("setInterval called");
     processMessages(bot);
   }, 10000);
   bot.on("message", async (msg, match) => {
-    // console.log("msg, match", JSON.stringify(msg));
-    // console.log("msg, match", JSON.stringify(match));
     const {
       from,
       text,
@@ -390,16 +428,19 @@ function bot(torrent, bot) {
       text,
       caption
     }));
-
-    if (!(msg.text && msg.text.startsWith("/"))) {
-      pushInMessageQueue({
-        msg,
-        match,
-        mode: activeMode,
-        category: activeCategory,
-        activeLinkType
-      });
-    }
+    checkUser(() => {
+      // console.log("msg, match", JSON.stringify(msg));
+      // console.log("msg, match", JSON.stringify(match));
+      if (!(msg.text && msg.text.startsWith("/"))) {
+        pushInMessageQueue({
+          msg,
+          match,
+          mode: activeMode,
+          category: activeCategory,
+          activeLinkType
+        });
+      }
+    }, msg);
   });
   bot.on("chat_join_request", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));

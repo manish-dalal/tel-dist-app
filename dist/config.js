@@ -28,6 +28,8 @@ const config = {
   THUMB_FILE_ID: process.env.THUMB_FILE_ID || defaultValue.THUMB_FILE_ID || "https://drive.google.com/uc?export=view&id=1GK6SH3Kwgu-Nwr4ilQPyiKuk26tbZmxb",
   CLOUDINARY_NAME: process.env.CLOUDINARY_NAME || defaultValue.CLOUDINARY_NAME,
   CLOUDINARY_API: process.env.CLOUDINARY_API || defaultValue.CLOUDINARY_API,
-  CLOUDINARY_SECRET: process.env.CLOUDINARY_SECRET || defaultValue.CLOUDINARY_SECRET
+  CLOUDINARY_SECRET: process.env.CLOUDINARY_SECRET || defaultValue.CLOUDINARY_SECRET,
+  REMOVE_CHANNEL_NAME: process.env.REMOVE_CHANNEL_NAME || defaultValue.REMOVE_CHANNEL_NAME,
+  ADMIN_USERS: process.env.ADMIN_USERS || defaultValue.ADMIN_USERS || "[]"
 };
 module.exports = config;
