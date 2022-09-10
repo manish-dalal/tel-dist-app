@@ -92,7 +92,7 @@ const sleep = ms => {
 
 const removeUsername = (str, maniChannelName = config.CHANNEL) => {
   // console.log("dddffff", _.get(config, "REMOVE_CHANNEL_NAME", true));
-  if (!_.get(config, "REMOVE_CHANNEL_NAME", true)) {
+  if (!JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true"))) {
     return str;
   }
 
