@@ -29,7 +29,7 @@ const config = {
   CLOUDINARY_NAME: process.env.CLOUDINARY_NAME || defaultValue.CLOUDINARY_NAME,
   CLOUDINARY_API: process.env.CLOUDINARY_API || defaultValue.CLOUDINARY_API,
   CLOUDINARY_SECRET: process.env.CLOUDINARY_SECRET || defaultValue.CLOUDINARY_SECRET,
-  REMOVE_CHANNEL_NAME: process.env.REMOVE_CHANNEL_NAME || defaultValue.REMOVE_CHANNEL_NAME,
+  REMOVE_CHANNEL_NAME: process.env.REMOVE_CHANNEL_NAME,
   ADMIN_USERS: process.env.ADMIN_USERS || defaultValue.ADMIN_USERS || "[]"
 };
 module.exports = config;
