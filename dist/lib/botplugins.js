@@ -90,9 +90,13 @@ const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const removeUsername = (str, maniChannelName = config.CHANNEL) => {
+const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChannelName = false) => {
   // console.log("dddffff", _.get(config, "REMOVE_CHANNEL_NAME", true));
-  if (!JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true"))) {
+  // true Not remove name
+  // false Remove name (default)
+  const check = JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true")) || ignoreRemoveChannelName;
+
+  if (!check) {
     return str;
   }
 
@@ -447,7 +451,7 @@ const processMessages = async bot => {
               cloudinaryUrl
             } = msg;
             await sleep(7000);
-            let clStr = removeUsername(msg.text, maniChannelName);
+            let clStr = removeUsername(msg.text, maniChannelName, true);
             const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
             clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
