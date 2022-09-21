@@ -27,6 +27,7 @@ const {
 let dataArray = [];
 let isMessageProcessing = false;
 let processStats = {};
+let lastTelgramSendRequest = new Date();
 const iMode = {
   THUMB: 1,
   CHANNELREMOVER: 2,
@@ -450,7 +451,9 @@ const processMessages = async bot => {
               isEuOrgLink = true,
               cloudinaryUrl
             } = msg;
-            await sleep(7000);
+            const remaingTime = 7000 - (new Date().getTime() - lastTelgramSendRequest.getTime());
+            console.log("remaingTime", remaingTime);
+            await sleep(Math.max(remaingTime, 0));
             let clStr = removeUsername(msg.text, maniChannelName, true);
             const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
             clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
@@ -477,6 +480,7 @@ const processMessages = async bot => {
               await bot.sendMessage(targetChatId, clStr);
             }
 
+            lastTelgramSendRequest = new Date();
             additionalAction && additionalAction();
           } catch (errorDb) {
             msg.additionalAction && msg.additionalAction(errorDb.message);

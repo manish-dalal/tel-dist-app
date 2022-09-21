@@ -20,7 +20,7 @@ const router = express.Router();
 router.post("/add", async (req, res) => {
   const body = req.body;
   body.botToken = config.TELEGRAM_TOKEN;
-  body.cname = body.cname || config.CNAME;
+  body.cname = body.cname || "v1";
   body.status = "active";
   const {
     data
@@ -42,7 +42,7 @@ router.post("/add", async (req, res) => {
 router.post("/update", async (req, res) => {
   const body = req.body; // body.botToken = config.TELEGRAM_TOKEN;
 
-  body.cname = body.cname || config.CNAME;
+  body.cname = body.cname || "v1";
   const {
     data
   } = await axios.put(`${serverUrl}/task/${body._id}`, body);
