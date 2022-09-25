@@ -191,7 +191,8 @@ router.get("/backupMessage", async (req, res) => {
     const {
       linkType,
       text = defaultText,
-      thumbUrl = ""
+      thumbUrl = "",
+      ignoreRemoveChannelName = false
     } = req.query;
     const {
       data
@@ -206,7 +207,8 @@ router.get("/backupMessage", async (req, res) => {
           maniChannelName: el.channelName,
           isEuOrgLink: false,
           isNewMdisk: false,
-          thumbUrl
+          thumbUrl,
+          ignoreRemoveChannelName
         };
         pushInMessageQueue({
           msg,

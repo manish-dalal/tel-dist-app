@@ -449,14 +449,15 @@ const processMessages = async bot => {
               maniChannelName = config.CHANNEL,
               isNewMdisk = false,
               isEuOrgLink = true,
-              cloudinaryUrl
+              cloudinaryUrl,
+              ignoreRemoveChannelName = false
             } = msg;
+            let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, true);
+            const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
+            clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const remaingTime = 7000 - (new Date().getTime() - lastTelgramSendRequest.getTime());
             console.log("remaingTime", remaingTime);
             await sleep(Math.max(remaingTime, 0));
-            let clStr = removeUsername(msg.text, maniChannelName, true);
-            const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
-            clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
             const opts = {
               caption: clStr.slice(0, 1025)
             };
