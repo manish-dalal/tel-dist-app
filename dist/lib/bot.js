@@ -445,29 +445,33 @@ function bot(torrent, bot) {
   bot.on("chat_join_request", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
-    const {
-      chat,
-      from
-    } = msg;
-    chat.id = chat.id.toString();
-    from.id = from.id.toString();
-    const apiUrl = `${config.MONGO_API_URL}/joinrequest`;
-    const body = {
-      action: "add",
-      data: {
+    const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL;
+
+    if (mongoApiUrl) {
+      const {
         chat,
+        from
+      } = msg;
+      chat.id = chat.id.toString();
+      from.id = from.id.toString();
+      const apiUrl = `${mongoApiUrl}/joinrequest`;
+      const body = {
+        action: "add",
+        data: {
+          chat,
+          from,
+          token: config.TELEGRAM_TOKEN
+        }
+      };
+      const {
+        data
+      } = await axios.post(apiUrl, body);
+      Logger.info(JSON.stringify({
         from,
-        token: config.TELEGRAM_TOKEN
-      }
-    };
-    const {
-      data
-    } = await axios.post(apiUrl, body);
-    Logger.info(JSON.stringify({
-      from,
-      chat,
-      data
-    }));
+        chat,
+        data
+      }));
+    }
   });
 } // chat_join_request
 // https://github.com/yagop/node-telegram-bot-api/blob/master/doc/usage.md#events

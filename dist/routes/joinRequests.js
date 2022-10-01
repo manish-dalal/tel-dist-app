@@ -12,10 +12,23 @@ const {
 
 const botMethods = require("../lib/botMethods");
 
-const MONGO_API_URL = config.MONGO_API_URL;
+const MONGO_API_URL = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL;
 const router = express.Router();
 const apiUrl = `${MONGO_API_URL}/joinrequest`;
-router.post("/all", async (req, res) => {
+
+const checkApiUrl = (request, response, next) => {
+  if (!MONGO_API_URL) {
+    response.status(200).send({
+      error: true,
+      message: "Server requires MONGO_API_URL",
+      data: {}
+    });
+  } else {
+    next();
+  }
+};
+
+router.post("/all", checkApiUrl, async (req, res) => {
   const body = req.body;
   body.data = { ...body.data,
     token: config.TELEGRAM_TOKEN
@@ -51,7 +64,7 @@ const deleteRequests = async (ids = []) => {
   return res;
 };
 
-router.post("/approve", async (req, res) => {
+router.post("/approve", checkApiUrl, async (req, res) => {
   const body = req.body;
   const {
     requests = []
@@ -78,7 +91,7 @@ router.post("/approve", async (req, res) => {
     data
   });
 });
-router.post("/approveandclear", async (req, res) => {
+router.post("/approveandclear", checkApiUrl, async (req, res) => {
   const body = req.body;
   const {
     requests = []
@@ -105,7 +118,7 @@ router.post("/approveandclear", async (req, res) => {
     data
   });
 });
-router.post("/reject", async (req, res) => {
+router.post("/reject", checkApiUrl, async (req, res) => {
   const body = req.body;
   const {
     requests = []
@@ -114,10 +127,10 @@ router.post("/reject", async (req, res) => {
 
   for (const request of requests) {
     try {
+      newIds.push({
+        $oid: request._id
+      });
       const res = await botMethods.declineChatJoinRequest(request.chat.id, request.from.id);
-      newIds.push({
-        $oid: request._id
-      });
     } catch (error) {
       Logger.error("Error Reject chat requests", error.message);
     }
