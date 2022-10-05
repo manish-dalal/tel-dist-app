@@ -24,10 +24,15 @@ const {
   getCloudinarySignature
 } = require("../utils/getCloudinarySignature");
 
+const humanTime = require("../utils/humanTime");
+
+const {
+  getBotInstanseAndSleep
+} = require("./botMethods");
+
 let dataArray = [];
 let isMessageProcessing = false;
 let processStats = {};
-let lastTelgramSendRequest = new Date();
 const iMode = {
   THUMB: 1,
   CHANNELREMOVER: 2,
@@ -328,6 +333,7 @@ const processMessages = async bot => {
     const tempData = dataArray;
     dataArray = [];
     let lastMessageData = {};
+    const currentTime1 = new Date();
 
     for (const el of tempData) {
       var _msg$chat;
@@ -455,9 +461,6 @@ const processMessages = async bot => {
             let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, true);
             const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
             clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
-            const remaingTime = 7000 - (new Date().getTime() - lastTelgramSendRequest.getTime());
-            console.log("remaingTime", remaingTime);
-            await sleep(Math.max(remaingTime, 0));
             const opts = {
               caption: clStr.slice(0, 1025)
             };
@@ -471,17 +474,21 @@ const processMessages = async bot => {
               };
             }
 
+            const botFinal = await getBotInstanseAndSleep({
+              bot,
+              chatId: targetChatId
+            });
+
             if (thumbUrl || imgDriveId || cloudinaryUrl) {
               const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
               imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${(Math.random() * 100).toFixed()}` : tempUrl); // `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
 
               console.log("imageUrl##", imageUrl);
-              const sendData = await bot.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);
+              const sendData = await botFinal.sendPhoto(targetChatId, imageUrl, opts); // console.log("sendData###", sendData);
             } else {
-              await bot.sendMessage(targetChatId, clStr);
+              await botFinal.sendMessage(targetChatId, clStr);
             }
 
-            lastTelgramSendRequest = new Date();
             additionalAction && additionalAction();
           } catch (errorDb) {
             msg.additionalAction && msg.additionalAction(errorDb.message);
@@ -506,8 +513,10 @@ const processMessages = async bot => {
         isMessageProcessing = false;
         console.log("I am free. Next data=", dataArray.length);
       }
-    } // isMessageProcessing = false;
+    }
 
+    const currentTime2 = new Date();
+    console.log("Time taken", humanTime(currentTime2.getTime() - currentTime1.getTime())); // isMessageProcessing = false;
   }
 };
 

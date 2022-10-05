@@ -30,6 +30,7 @@ const config = {
   CLOUDINARY_API: process.env.CLOUDINARY_API || defaultValue.CLOUDINARY_API,
   CLOUDINARY_SECRET: process.env.CLOUDINARY_SECRET || defaultValue.CLOUDINARY_SECRET,
   REMOVE_CHANNEL_NAME: process.env.REMOVE_CHANNEL_NAME || defaultValue.REMOVE_CHANNEL_NAME,
-  ADMIN_USERS: process.env.ADMIN_USERS || defaultValue.ADMIN_USERS || "[]"
+  ADMIN_USERS: process.env.ADMIN_USERS || defaultValue.ADMIN_USERS || "[]",
+  TELEGRAM_TOKEN_1: process.env.TELEGRAM_TOKEN_1 || defaultValue.TELEGRAM_TOKEN_1
 };
 module.exports = config;
