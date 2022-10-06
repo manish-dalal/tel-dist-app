@@ -516,7 +516,8 @@ const processMessages = async bot => {
     }
 
     const currentTime2 = new Date();
-    console.log("Time taken", humanTime(currentTime2.getTime() - currentTime1.getTime())); // isMessageProcessing = false;
+    console.log("Time taken", humanTime(currentTime2.getTime() - currentTime1.getTime()));
+    Logger.info(`${tempData.length} messages were sent in ${humanTime(currentTime2.getTime() - currentTime1.getTime())}`); // isMessageProcessing = false;
   }
 };
 

@@ -46,6 +46,7 @@ const isBotAddedInChat = async (chatId, botInstance) => {
     return false;
   } else {
     try {
+      console.log("validChatArr", JSON.stringify(validChatArr), chatId);
       const respq = await botInstance.getChatAdministrators(chatId);
       validChatArr.approved.push(chatId);
       return true;
@@ -69,6 +70,7 @@ const getBotInstanseAndSleep = async ({
   const remaingTime1 = Math.max(7000 - (new Date().getTime() - lastTelgramSendRequest1.getTime()), 0);
 
   if (remaingTime > remaingTime1 && bot1) {
+    console.log("remaingTime1", remaingTime1);
     await sleep(Math.max(remaingTime1, 0));
     const isBotAdmin = await isBotAddedInChat(chatId, bot1);
 
@@ -78,6 +80,7 @@ const getBotInstanseAndSleep = async ({
     }
   }
 
+  console.log("remaingTime", remaingTime);
   await sleep(Math.max(remaingTime, 0));
   lastTelgramSendRequest = new Date();
   return bot;
