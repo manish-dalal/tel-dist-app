@@ -445,16 +445,7 @@ function bot(torrent, bot) {
   bot.on("chat_join_request", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
-    const {
-      from,
-      text,
-      caption
-    } = msg;
-    Logger.info("chat_join_request", JSON.stringify({
-      from,
-      text,
-      caption
-    }));
+    Logger.info("chat_join_request", JSON.stringify(msg));
     const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL;
 
     if (mongoApiUrl) {
