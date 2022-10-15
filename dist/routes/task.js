@@ -180,18 +180,27 @@ router.post("/start", async (req, res) => {
 });
 router.get("/backupMessage", async (req, res) => {
   try {
-    const defaultText = `𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐃 𝐁𝐘 @primexmov
+    const defaultText = `Friends Now a days Telegram Is Banning Many Movies Channels. Our Channels Also Got Banned. So, Please Join This Backup Channel For Future Update.
 
-    Sabhi Log Backup Channel Bhi Join Kerlo Jab Bhi Ye Channel Ban Hoga Toh New Channel Ki Link Issme Mil Jayegi 💦✊🏿👇🏻 
-    https://t.me/primexmov`; // const urlstr = new URLSearchParams({
-    //   text: defaultText
-    // }).toString();
-    // console.log("urlstr=", urlstr);
+If Telegram Ban Our Channel We Will Give You New Channel Link On This Channel.
 
+
+दोस्तों आजकल टेलीग्राम कई चैनलों पर प्रतिबंध लगा रहा है। हमारे कई चैनलों पर भी प्रतिबंध लगा दिया। इसलिए, भविष्य के अपडेट के लिए कृपया इस बैकअप चैनल से जुड़ें। 
+    
+यदि टेलीग्राम द्वारा हमारे चैनल पर प्रतिबंध लगाया गया तो हम आपको इस चैनल पर नए चैनल लिंक देंगे ।
+    
+👇👇👇👇👇👇👇👇👇👇👇👇   
+🔋🔋
+Channel:-
+_CHANNEL_
+_CHANNEL_
+_CHANNEL_
+🔋🔋🔋`;
     const {
       linkType,
       text = defaultText,
       thumbUrl = "",
+      channel = "",
       ignoreRemoveChannelName = false
     } = req.query;
     const {
@@ -201,14 +210,21 @@ router.get("/backupMessage", async (req, res) => {
 
     if (text) {
       filterData.forEach(el => {
+        const mainChannel = channel ? channel : `@${el.channelName}`;
+        let fText = text;
+
+        if (!ignoreRemoveChannelName) {
+          fText = text.replace(/_CHANNEL_/g, mainChannel);
+        }
+
         const msg = {
-          text,
+          text: fText,
           targetChatId: el.groupInfo.id,
           maniChannelName: el.channelName,
           isEuOrgLink: false,
           isNewMdisk: false,
           thumbUrl,
-          ignoreRemoveChannelName
+          ignoreRemoveChannelName: true
         };
         pushInMessageQueue({
           msg,
