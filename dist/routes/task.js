@@ -200,8 +200,7 @@ _CHANNEL_
       linkType,
       text = defaultText,
       thumbUrl = "",
-      channel = "",
-      ignoreRemoveChannelName = false
+      channel = ""
     } = req.query;
     const {
       data
@@ -211,12 +210,7 @@ _CHANNEL_
     if (text) {
       filterData.forEach(el => {
         const mainChannel = channel ? channel : `@${el.channelName}`;
-        let fText = text;
-
-        if (!ignoreRemoveChannelName) {
-          fText = text.replace(/_CHANNEL_/g, mainChannel);
-        }
-
+        const fText = text.replace(/_CHANNEL_/g, mainChannel);
         const msg = {
           text: fText,
           targetChatId: el.groupInfo.id,
