@@ -45,7 +45,11 @@ const {
   Logger: logger
 } = require("./utils/winston");
 
-require("dotenv").load();
+const envFile = process.env.NODE_ENV && process.env.NODE_ENV == "dev" ? `.env.${process.env.NODE_ENV}` : ".env";
+
+require("dotenv").config({
+  path: envFile
+});
 
 const dev = config.NODE_ENV !== "production";
 const allowWeb = !config.DISABLE_WEB;
