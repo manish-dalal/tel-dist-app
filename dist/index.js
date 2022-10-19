@@ -45,6 +45,8 @@ const {
   Logger: logger
 } = require("./utils/winston");
 
+require("dotenv").load();
+
 const dev = config.NODE_ENV !== "production";
 const allowWeb = !config.DISABLE_WEB;
 const PORT = parseInt(config.PORT, 10) || 5000;
