@@ -39,19 +39,13 @@ const task = require("./routes/task");
 
 const joinRequests = require("./routes/joinRequests");
 
-const config = require("./config");
-
 const {
   Logger: logger
 } = require("./utils/winston");
 
-const envFile = process.env.NODE_ENV && process.env.NODE_ENV == "dev" ? `.env.${process.env.NODE_ENV}` : ".env";
+const config = require("./config");
 
-require("dotenv").config({
-  path: envFile
-});
-
-const dev = config.NODE_ENV !== "production";
+console.log("config .env \n", JSON.stringify(config));
 const allowWeb = !config.DISABLE_WEB;
 const PORT = parseInt(config.PORT, 10) || 5000;
 const server = express();

@@ -1,6 +1,5 @@
 node_modules/
 .next/
 test.js
-config.dev.js
 winstonLogs/
-.env
+.env*
