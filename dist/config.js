@@ -18,7 +18,7 @@ const config = {
   SITE: process.env.SITE,
   TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
   GDRIVE_TOKEN: process.env.GDRIVE_TOKEN,
-  PORT: process.env.PORT,
+  PORT: process.env.PORT || 5000,
   MONGO_API_URL: process.env.MONGO_API_URL,
   CHANNEL: process.env.CHANNEL,
   REPLACE_TEXTS: process.env.REPLACE_TEXTS || "[]",
