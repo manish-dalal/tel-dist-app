@@ -2,6 +2,8 @@
 
 const axios = require("axios");
 
+const get = require("lodash/get");
+
 const status = require("../utils/status");
 
 const diskinfo = require("../utils/diskinfo");
@@ -445,7 +447,12 @@ function bot(torrent, bot) {
   bot.on("chat_join_request", async (msg, match) => {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
-    Logger.info("chat_join_request" + JSON.stringify(msg));
+    const isAceeptBotLink = get(msg, "invite_link.name", "").toLowerCase().includes("accept") || get(msg, "invite_link.creator.first_name", "").toLowerCase().includes("accept");
+
+    if (!isAceeptBotLink) {
+      Logger.info("chat_join_request" + JSON.stringify(msg));
+    }
+
     const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL;
 
     if (mongoApiUrl) {

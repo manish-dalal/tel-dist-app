@@ -350,7 +350,7 @@ const processMessages = async bot => {
       processStats.nextData = dataArray.length;
       console.log("inddddddex", processStats.current, "of ", processStats.total);
       console.log("Next data Length", processStats.nextData);
-      const chatId = msg === null || msg === void 0 ? void 0 : (_msg$chat = msg.chat) === null || _msg$chat === void 0 ? void 0 : _msg$chat.id;
+      let chatId = msg === null || msg === void 0 ? void 0 : (_msg$chat = msg.chat) === null || _msg$chat === void 0 ? void 0 : _msg$chat.id;
 
       try {
         // for for saving message to db
@@ -415,6 +415,13 @@ const processMessages = async bot => {
             Logger.error(error.message || "SaveMsg error occured");
           }
         } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER) {
+          // link conversion
+          const designationChat = config.DESIGNATION_CHAT || "";
+
+          if ((mode === iMode.MDISK || mode === iMode.MDISKDUPLICATE) && designationChat) {
+            chatId = designationChat;
+          }
+
           const convertedStr = await multiLinkCon(msg.caption || msg.text, mode);
 
           if ((msg.document || msg.video || msg.audio || msg.photo) && convertedStr) {

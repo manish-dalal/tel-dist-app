@@ -8,7 +8,8 @@ const axios = require("axios");
 
 const {
   pushInMessageQueue,
-  iMode
+  iMode,
+  getProcessStats
 } = require("../lib/botplugins");
 
 const {
@@ -249,6 +250,17 @@ router.get("/telegramget", async (req, res) => {
     });
   } catch (error) {
     Logger.error(error.message || "telegramget error occured");
+    return res.json({
+      error: true,
+      error: error.message
+    });
+  }
+});
+router.get("/processStats", async (req, res) => {
+  try {
+    return res.json(getProcessStats());
+  } catch (error) {
+    Logger.error(error.message || "processStats api error occured");
     return res.json({
       error: true,
       error: error.message

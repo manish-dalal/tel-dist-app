@@ -36,6 +36,7 @@ const config = {
   CLOUDINARY_SECRET: process.env.CLOUDINARY_SECRET,
   REMOVE_CHANNEL_NAME: process.env.REMOVE_CHANNEL_NAME,
   ADMIN_USERS: process.env.ADMIN_USERS || "[]",
-  TELEGRAM_TOKEN_1: process.env.TELEGRAM_TOKEN_1
+  TELEGRAM_TOKEN_1: process.env.TELEGRAM_TOKEN_1,
+  DESIGNATION_CHAT: process.env.DESIGNATION_CHAT
 };
 module.exports = config;
