@@ -116,11 +116,6 @@ router.post("/start", async (req, res) => {
         isEuOrgLink = true,
         isNewMdisk
       } = task;
-      const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, {
-        status: "processing",
-        lastExecuted: new Date()
-      });
-      console.log("taskRes start", taskUpdateRes.data);
       let params = {
         category,
         cname,
@@ -135,6 +130,24 @@ router.post("/start", async (req, res) => {
         totalpages,
         messages
       } = messageResponse.data;
+      const parsePage = parseInt(page);
+      const parsepageIncrementor = parseInt(pageIncrementor);
+      const expectedNextPage = parsePage + parsepageIncrementor;
+      const nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
+      let taskUpdatedData = {
+        status: "processing",
+        lastExecuted: new Date()
+      };
+
+      if (!messages.length) {
+        taskUpdatedData = {
+          status: "Reset Active page",
+          page: nextPage
+        };
+      }
+
+      const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, taskUpdatedData);
+      console.log("taskRes start", taskUpdateRes.data);
       messages.forEach(element => {
         const msg = { ...element,
           targetChatId: groupInfo.id,
@@ -146,10 +159,6 @@ router.post("/start", async (req, res) => {
 
         if (messages[messages.length - 1] === element) {
           msg["additionalAction"] = async (errorMess = "") => {
-            const parsePage = parseInt(page);
-            const parsepageIncrementor = parseInt(pageIncrementor);
-            const expectedNextPage = parsePage + parsepageIncrementor;
-            const nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
             const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, {
               status: errorMess || "active",
               page: nextPage
