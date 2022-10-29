@@ -1,24 +1,17 @@
 "use strict";
 
-// const disk = require("diskusage");
+const disk = require("diskusage");
 const prettyBytes = require("../utils/prettyBytes");
-
 const os = require("os");
-
-let path = os.platform() === "win32" ? "c:" : "/";
-
-async function diskinfo(path = "/") {
+let osPath = os.platform() === "win32" ? "c:" : "/";
+async function diskinfo(path = osPath) {
   try {
-    // const { available, free, total } = await disk.check(path);
+    const res = await disk.check(path);
     const {
       available,
       free,
       total
-    } = {
-      available: 0,
-      free: 0,
-      total: 0
-    };
+    } = res;
     return {
       path,
       available: prettyBytes(available),
@@ -30,5 +23,4 @@ async function diskinfo(path = "/") {
     return e.message;
   }
 }
-
 module.exports = diskinfo;

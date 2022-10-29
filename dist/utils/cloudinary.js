@@ -4,11 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _cloudinary = require("cloudinary");
+const config = require("../config");
 
-const config = require("../config"); // Configure your cloud name, API key and API secret:
-
+// Configure your cloud name, API key and API secret:
 
 const {
   CLOUDINARY_NAME,

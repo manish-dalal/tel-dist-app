@@ -1,17 +1,12 @@
 "use strict";
 
 const express = require("express");
-
 const piratebayDetails = require("../crawllers/piratebay/details");
-
 const o337xDetails = require("../crawllers/1337x/details");
-
 const limetorrentDetails = require("../crawllers/limetorrent/details");
-
 const router = express.Router();
 router.get("/piratebay", async (req, res) => {
   let query = req.query.query;
-
   if (query === "" || !query) {
     res.send({
       error: true,
@@ -24,7 +19,6 @@ router.get("/piratebay", async (req, res) => {
 });
 router.get("/1337x", async (req, res) => {
   let query = req.query.query;
-
   if (query === "" || !query) {
     res.send({
       error: true,
@@ -37,7 +31,6 @@ router.get("/1337x", async (req, res) => {
 });
 router.get("/limetorrent", async (req, res) => {
   let query = req.query.query;
-
   if (query === "" || !query) {
     res.send({
       error: true,

@@ -1,28 +1,18 @@
 "use strict";
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 const WebTorrent = require("webtorrent");
-
 const fs = require("fs");
-
 const prettyBytes = require("../utils/prettyBytes");
-
 const humanTime = require("../utils/humanTime");
-
 const mkfile = require("../utils/mkfile");
-
 const ziper = require("../utils/ziper");
-
 const {
   uploadWithLog
 } = require("../utils/gdrive");
-
 const config = require("../config");
-
 const site = config.SITE || "SET SITE ENVIORMENT VARIABLE. READ DOCS";
 if (!site) console.log("SET SITE ENVIORMENT VARIABLE. READ DOCS\n");
-
 class Torrent {
   constructor() {
     _defineProperty(this, "statusLoader", torrent => {
@@ -40,7 +30,6 @@ class Torrent {
         done: torrent.done
       };
     });
-
     _defineProperty(this, "download", (magnetURI, onStart, onDone, onDriveUpload, onDriveUploadStart) => {
       if (!this.client.get(magnetURI)) {
         const torrent = this.client.add(magnetURI);
@@ -61,19 +50,15 @@ class Torrent {
         return torrent;
       }
     });
-
     _defineProperty(this, "remove", magnetURI => {
       this.client.get(magnetURI) ? this.client.remove(magnetURI) : undefined;
       return null;
     });
-
     _defineProperty(this, "list", () => this.downloads);
-
     _defineProperty(this, "get", magnetURI => {
       const torr = this.client.get(magnetURI);
       return torr ? this.statusLoader(torr) : null;
     });
-
     _defineProperty(this, "saveFiles", async (torrent, onDriveUpload, onDriveUploadStart) => {
       torrent.files.forEach((file, i) => {
         let filePath;
@@ -83,7 +68,6 @@ class Torrent {
         let torrentFile = file.createReadStream();
         torrentFile.pipe(toFile);
       });
-
       try {
         ziper(`./downloads/${torrent.infoHash}/${torrent.name}`);
         const torr = this.statusLoader(torrent);
@@ -94,14 +78,11 @@ class Torrent {
         console.log(e);
       }
     });
-
     this.downloads = [];
     this.client = new WebTorrent();
     setInterval(() => {
       this.downloads = this.client.torrents.map(torrent => this.get(torrent.magnetURI));
     }, 3000);
   }
-
 }
-
 module.exports = Torrent;

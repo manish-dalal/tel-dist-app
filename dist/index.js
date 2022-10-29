@@ -1,50 +1,32 @@
 "use strict";
 
 const express = require("express");
-
 const fs = require("fs");
-
 const compression = require("compression");
-
 const bodyParser = require("body-parser");
-
 const serveIndex = require("serve-index");
-
 const path = require("path");
-
 const humanTime = require("./utils/humanTime");
-
 const {
   keepalive
 } = require("./utils/keepalive");
-
 const diskinfo = require("./utils/diskinfo");
-
 const status = require("./utils/status");
-
 const {
   getFiles,
   sendFileStream,
   getAuthURL,
   getAuthToken
 } = require("./utils/gdrive");
-
 const search = require("./routes/search");
-
 const details = require("./routes/details");
-
 const torrent = require("./routes/torrent");
-
 const task = require("./routes/task");
-
 const joinRequests = require("./routes/joinRequests");
-
 const {
   Logger: logger
 } = require("./utils/winston");
-
 const config = require("./config");
-
 console.log("config .env \n", JSON.stringify(config));
 const allowWeb = !config.DISABLE_WEB;
 const PORT = parseInt(config.PORT, 10) || 5000;
@@ -73,7 +55,6 @@ server.get("/clearlogs", (req, res) => {
       if (err) {
         return console.error(err);
       }
-
       console.log(`Directory created successfully! ${dir}`);
     });
     return res.send(`Successfully removed file with the path of ${dir}`);
@@ -93,7 +74,6 @@ server.use("/api/v1/drive/file/:id", sendFileStream);
 server.use("/api/v1/drive/getAuthURL", (req, res) => {
   const CLIENT_ID = req.query.clientId;
   const CLIENT_SECRET = req.query.clientSecret;
-
   if (!CLIENT_ID || !CLIENT_SECRET) {
     res.send(JSON.stringify({
       error: "Client Id and secret are required"
@@ -110,7 +90,6 @@ server.use("/api/v1/drive/getAuthToken", async (req, res) => {
   const CLIENT_ID = req.query.clientId;
   const CLIENT_SECRET = req.query.clientSecret;
   const AUTH_CODE = req.query.authCode;
-
   if (!CLIENT_ID || !CLIENT_SECRET || !AUTH_CODE) {
     res.send(JSON.stringify({
       error: "Client Id and secret and auth code are required"
@@ -142,7 +121,6 @@ server.get("/api/v1/status", async (req, res) => {
   const currStatus = await status();
   res.send(currStatus);
 });
-
 if (allowWeb) {
   console.log("web allowed", "env", process.env.NODE_ENV);
   server.use("/static", express.static(path.join(__dirname, "web/build/static")));
@@ -152,7 +130,6 @@ if (allowWeb) {
 } else {
   console.log("web disabled");
 }
-
 server.listen(PORT, () => {
   console.log(`> Running on http://localhost:${PORT}`);
   logger.info("Server running...");

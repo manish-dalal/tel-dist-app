@@ -1,9 +1,7 @@
 "use strict";
 
 const puppeteer = require("puppeteer");
-
 const O337X_SITE = process.env.O337X_SITE || "https://www.1337x.am/search/{term}/1/";
-
 async function search(search, site = O337X_SITE) {
   try {
     var browser = await puppeteer.launch({
@@ -14,14 +12,12 @@ async function search(search, site = O337X_SITE) {
     await page.goto(site.replace("{term}", search));
     var searchResults = await page.evaluate(async () => {
       var searchResults = document.querySelector("tbody");
-
       if (!searchResults) {
         return {
           error: true,
           errorMessage: "No results found"
         };
       }
-
       var tableRows = searchResults.querySelectorAll("tr");
       var results = [];
       tableRows.forEach(item => {
@@ -50,5 +46,4 @@ async function search(search, site = O337X_SITE) {
     };
   }
 }
-
 module.exports = search;

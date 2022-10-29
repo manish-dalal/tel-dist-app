@@ -1,9 +1,7 @@
 "use strict";
 
 const puppeteer = require("puppeteer");
-
 const PIRATEBAY_SITE = process.env.PIRATEBAY_SITE || "https://thepiratebay.org/search/{term}";
-
 async function search(search, site = PIRATEBAY_SITE) {
   try {
     var browser = await puppeteer.launch({
@@ -14,14 +12,12 @@ async function search(search, site = PIRATEBAY_SITE) {
     await page.goto(site.replace("{term}", search));
     var searchResults = await page.evaluate(async () => {
       var searchResults = document.querySelector("div#SearchResults");
-
       if (!searchResults) {
         return {
           error: true,
           errorMessage: "No results found"
         };
       }
-
       var tableRows = searchResults.querySelectorAll("tr");
       var results = [];
       tableRows.forEach(item => {
@@ -51,5 +47,4 @@ async function search(search, site = PIRATEBAY_SITE) {
     };
   }
 }
-
 module.exports = search;

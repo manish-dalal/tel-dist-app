@@ -1,21 +1,16 @@
 "use strict";
 
 const express = require("express");
-
 const config = require("../config");
-
 const axios = require("axios");
-
 const {
   pushInMessageQueue,
   iMode,
   getProcessStats
 } = require("../lib/botplugins");
-
 const {
   Logger
 } = require("../utils/winston");
-
 const serverUrl = config.SERVER_SITE;
 const router = express.Router();
 router.post("/add", async (req, res) => {
@@ -26,7 +21,6 @@ router.post("/add", async (req, res) => {
   const {
     data
   } = await axios.post(`${serverUrl}/task/`, body);
-
   if (!data) {
     Logger.error("Error Add task");
     res.send({
@@ -41,13 +35,12 @@ router.post("/add", async (req, res) => {
   }
 });
 router.post("/update", async (req, res) => {
-  const body = req.body; // body.botToken = config.TELEGRAM_TOKEN;
-
+  const body = req.body;
+  // body.botToken = config.TELEGRAM_TOKEN;
   body.cname = body.cname || "v1";
   const {
     data
   } = await axios.put(`${serverUrl}/task/${body._id}`, body);
-
   if (!data) {
     Logger.error("Error update task");
     res.send({
@@ -68,7 +61,6 @@ router.post("/remove", async (req, res) => {
   } = await axios.put(`${serverUrl}/task/${body._id}`, {
     isDeleted: true
   });
-
   if (!data) {
     Logger.error("Error remove task");
     res.send({
@@ -138,25 +130,23 @@ router.post("/start", async (req, res) => {
         status: "processing",
         lastExecuted: new Date()
       };
-
       if (!messages.length) {
         taskUpdatedData = {
           status: "Reset Active page",
           page: nextPage
         };
       }
-
       const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, taskUpdatedData);
       console.log("taskRes start", taskUpdateRes.data);
       messages.forEach(element => {
-        const msg = { ...element,
+        const msg = {
+          ...element,
           targetChatId: groupInfo.id,
           thumbUrl,
           maniChannelName: channelName,
           isEuOrgLink,
           isNewMdisk
         };
-
         if (messages[messages.length - 1] === element) {
           msg["additionalAction"] = async (errorMess = "") => {
             const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, {
@@ -166,14 +156,12 @@ router.post("/start", async (req, res) => {
             console.log("taskUpdateRes End", taskUpdateRes.data);
           };
         }
-
         pushInMessageQueue({
           msg,
           mode: iMode.DBMESSAGESENDER
         });
       });
     }
-
     console.log("Send add response");
     res.json({
       error: false,
@@ -216,7 +204,6 @@ _CHANNEL_
       data
     } = await axios.get(`${serverUrl}/task/list?botToken=${config.TELEGRAM_TOKEN}`);
     const filterData = data.tasks.filter(e => e.linkType === linkType);
-
     if (text) {
       filterData.forEach(el => {
         const mainChannel = channel ? channel : `@${el.channelName}`;
@@ -236,7 +223,6 @@ _CHANNEL_
         });
       });
     }
-
     res.json({
       error: false,
       msg: text ? "Sucess" : "No text found"

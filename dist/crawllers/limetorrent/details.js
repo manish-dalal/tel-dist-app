@@ -1,7 +1,6 @@
 "use strict";
 
 const puppeteer = require("puppeteer");
-
 async function details(link) {
   try {
     var browser = await puppeteer.launch({
@@ -52,5 +51,4 @@ async function details(link) {
     };
   }
 }
-
 module.exports = details;

@@ -2,11 +2,9 @@
 
 const dev = process.env.NODE_ENV && process.env.NODE_ENV !== "production";
 const envFile = dev ? ".env.dev" : ".env";
-
 require("dotenv").config({
   path: envFile
 });
-
 const config = {
   DISABLE_WEB: process.env.DISABLE_WEB,
   SEARCH_SITE: process.env.SEARCH_SITE,

@@ -1,10 +1,10 @@
 "use strict";
 
 const fs = require("fs");
-
 const path = require("path");
+const logFile = path.join(__dirname, "..", "logs.txt");
 
-const logFile = path.join(__dirname, "..", "logs.txt"); // fs.writeFileSync(logFile, "");
+// fs.writeFileSync(logFile, "");
 
 function logger(...args) {
   let toWrite = "\n";
@@ -19,11 +19,9 @@ function logger(...args) {
         toWrite += arg;
       }
     }
-
     toWrite += " ";
   });
   console.log(toWrite);
   fs.appendFileSync(logFile, toWrite);
 }
-
 module.exports = logger;

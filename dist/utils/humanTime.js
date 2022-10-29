@@ -14,5 +14,4 @@ function humanTime(ms) {
   if (result === "") result += "0s";
   return result;
 }
-
 module.exports = humanTime;

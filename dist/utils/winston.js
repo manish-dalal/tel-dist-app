@@ -1,13 +1,9 @@
 "use strict";
 
 const winston = require("winston");
-
 const winstonDailyRotateFile = require("winston-daily-rotate-file");
-
 const path = require("path");
-
 const logger = require("./logger");
-
 const datePattern = `YYYY-MM-DD`;
 const errorLogTransport = new winstonDailyRotateFile({
   level: "error",

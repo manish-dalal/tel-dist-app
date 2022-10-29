@@ -1,9 +1,7 @@
 "use strict";
 
 const puppeteer = require("puppeteer");
-
 const LIMETORRENT_SITE = process.env.LIMETORRENT_SITE || "https://limetorrents.at/search?search={term}";
-
 async function search(search, site = LIMETORRENT_SITE) {
   try {
     var browser = await puppeteer.launch({
@@ -15,14 +13,12 @@ async function search(search, site = LIMETORRENT_SITE) {
     await page.goto(site.replace("{term}", search));
     var searchResults = await page.evaluate(async () => {
       var searchResults = document.querySelector("table.table2 > tbody");
-
       if (!searchResults) {
         return {
           error: true,
           errorMessage: "No results found"
         };
       }
-
       var tableRows = searchResults.querySelectorAll("tr");
       var results = [];
       tableRows.forEach(item => {
@@ -53,5 +49,4 @@ async function search(search, site = LIMETORRENT_SITE) {
     };
   }
 }
-
 module.exports = search;

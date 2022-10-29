@@ -1,41 +1,31 @@
 "use strict";
 
 const axios = require("axios");
-
 const get = require("lodash/get");
-
 const status = require("../utils/status");
-
 const diskinfo = require("../utils/diskinfo");
-
 const humanTime = require("../utils/humanTime");
-
 const {
   pushInMessageQueue,
   processMessages,
   iMode,
   getProcessStats
 } = require("./botplugins");
-
 const config = require("../config");
-
 const {
   Logger
 } = require("../utils/winston");
-
 const api = config.SEARCH_SITE || "https://torrent-aio-bot.herokuapp.com/";
 console.log("Using api: ", api);
 let activeMode = parseInt(config.DEFAULT_MODE) || 6;
 let activeCategory = parseInt(config.DEFAULT_CATEGORY) || 1;
 let activeLinkType = config.ACTIVE_LINK_TYPE || "mdisk";
 const adminUsersArr = JSON.parse(config.ADMIN_USERS);
-
 const checkUser = (action, msg) => {
   if (!adminUsersArr.length || adminUsersArr.includes(msg.from.id)) {
     action();
   }
 };
-
 const searchRegex = /\/search (piratebay|limetorrent|1337x) (.+)/;
 const detailsRegex = /\/details (piratebay|limetorrent|1337x) (.+)/;
 const downloadRegex = /\/download (.+)/;
@@ -87,10 +77,8 @@ Server status commands
 
 Happy torrenting :)
 `;
-
 const newStartText = msg => `**𝗛𝗘𝗟𝗟𝗢🎈${msg.chat.first_name}!** \n
 𝐈'𝐦 𝐚 Doodstream/mdisk 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭... \n𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
-
 const helpText = `You can control me by sending these commands:
 /setmode - Update active mode
 /getmode - get active mode 
@@ -101,14 +89,13 @@ const helpText = `You can control me by sending these commands:
 /sleep - Bot sleep in heroku time
 /help - Get help info \n
         "𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
-
 function bot(torrent, bot) {
   bot.on("callback_query", callbackQuery => {
     const msg = callbackQuery.message;
-    Logger.info(JSON.stringify({ ...(callbackQuery === null || callbackQuery === void 0 ? void 0 : callbackQuery.from)
+    Logger.info(JSON.stringify({
+      ...(callbackQuery === null || callbackQuery === void 0 ? void 0 : callbackQuery.from)
     }));
     console.log("msg ==========", JSON.stringify(callbackQuery));
-
     if (setcategoryRegex.test(msg.text)) {
       activeCategory = parseInt(callbackQuery.data);
       bot.sendMessage(msg.chat.id, `Active category = ${activeCategory}`);
@@ -240,7 +227,7 @@ function bot(torrent, bot) {
       const from = msg.chat.id;
       const path = match[1];
       const info = await diskinfo(path);
-      bot.sendMessage(from, info);
+      bot.sendMessage(from, JSON.stringify(info, null, 2));
     }, msg);
   });
   bot.onText(/\/server uptime/, async msg => {
@@ -265,7 +252,6 @@ function bot(torrent, bot) {
       const data = await axios(`${api}api/v1/search/${site}?query=${query}`).then(({
         data
       }) => data);
-
       if (!data || data.error) {
         bot.sendMessage(from, "An error occured on server");
       } else if (!data.results || data.results.length === 0) {
@@ -298,7 +284,6 @@ function bot(torrent, bot) {
       const data = await axios(`${api}/details/${site}?query=${query}`).then(({
         data
       }) => data);
-
       if (!data || data.error) {
         bot.sendMessage(from, "An error occured");
       } else if (data.torrent) {
@@ -322,13 +307,11 @@ function bot(torrent, bot) {
       var link = match[1];
       let messageObj = null;
       let torrInterv = null;
-
       const reply = async torr => {
         let mess1 = "";
         mess1 += `Name: ${torr.name}\n\n`;
         mess1 += `Status: ${torr.status}\n\n`;
         mess1 += `Size: ${torr.total}\n\n`;
-
         if (!torr.done) {
           mess1 += `Downloaded: ${torr.downloaded}\n\n`;
           mess1 += `Speed: ${torr.speed}\n\n`;
@@ -339,9 +322,7 @@ function bot(torrent, bot) {
           clearInterval(torrInterv);
           torrInterv = null;
         }
-
         mess1 += `Magnet URI: ${torr.magnetURI}`;
-
         try {
           if (messageObj) {
             if (messageObj.text !== mess1) bot.editMessageText(mess1, {
@@ -353,16 +334,12 @@ function bot(torrent, bot) {
           console.log(e.message);
         }
       };
-
       const onDriveUpload = (torr, url) => bot.sendMessage(from, `${torr.name} uploaded to drive\n${url}`);
-
       const onDriveUploadStart = torr => bot.sendMessage(from, `Uploading ${torr.name} to gdrive`);
-
       if (link.indexOf("magnet:") !== 0) {
         bot.sendMessage(from, "Link is not a magnet link");
       } else {
         bot.sendMessage(from, "Starting download...");
-
         try {
           const torren = torrent.download(link, torr => reply(torr), torr => reply(torr), onDriveUpload, onDriveUploadStart);
           torrInterv = setInterval(() => reply(torrent.statusLoader(torren)), 5000);
@@ -377,7 +354,6 @@ function bot(torrent, bot) {
       var from = msg.from.id;
       var link = match[1];
       const torr = torrent.get(link);
-
       if (link.indexOf("magnet:") !== 0) {
         bot.sendMessage(from, "Link is not a magnet link");
       } else if (!torr) {
@@ -387,7 +363,6 @@ function bot(torrent, bot) {
         mess1 += `Name: ${torr.name}\n\n`;
         mess1 += `Status: ${torr.status}\n\n`;
         mess1 += `Size: ${torr.total}\n\n`;
-
         if (!torr.done) {
           mess1 += `Downloaded: ${torr.downloaded}\n\n`;
           mess1 += `Speed: ${torr.speed}\n\n`;
@@ -396,7 +371,6 @@ function bot(torrent, bot) {
         } else {
           mess1 += `Link: ${torr.downloadLink}\n\n`;
         }
-
         mess1 += `Magnet URI: ${torr.magnetURI}`;
         bot.sendMessage(from, mess1);
       }
@@ -406,7 +380,6 @@ function bot(torrent, bot) {
     checkUser(() => {
       var from = msg.from.id;
       var link = match[1];
-
       try {
         torrent.remove(link);
         bot.sendMessage(from, "Removed");
@@ -448,13 +421,10 @@ function bot(torrent, bot) {
     // console.log("msg, match", JSON.stringify(msg));
     // console.log("msg, match", JSON.stringify(match));
     const isAceeptBotLink = get(msg, "invite_link.name", "").toLowerCase().includes("accept") || get(msg, "invite_link.creator.first_name", "").toLowerCase().includes("accept");
-
     if (!isAceeptBotLink) {
       Logger.info("chat_join_request" + JSON.stringify(msg));
     }
-
     const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL;
-
     if (mongoApiUrl) {
       const {
         chat,
@@ -481,9 +451,9 @@ function bot(torrent, bot) {
       }));
     }
   });
-} // chat_join_request
+}
+// chat_join_request
 // https://github.com/yagop/node-telegram-bot-api/blob/master/doc/usage.md#events
 // https://github.com/yagop/node-telegram-bot-api/blob/master/doc/api.md#TelegramBot+approveChatJoinRequest
-
 
 module.exports = bot;

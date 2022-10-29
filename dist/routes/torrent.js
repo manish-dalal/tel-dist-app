@@ -1,28 +1,20 @@
 "use strict";
 
 const express = require("express");
-
 const telegram = require("node-telegram-bot-api");
-
 const Torrent = require("../lib/torrent");
-
 const botInit = require("../lib/bot");
-
 const botMethods = require("../lib/botMethods");
-
 const config = require("../config");
-
 const {
   updateLastRequestTime
 } = require("../utils/keepalive");
-
 const torrent = new Torrent();
 const dev = process.env.NODE_ENV !== "production";
 const site = config.SITE;
 const token = config.TELEGRAM_TOKEN;
 const router = express.Router();
 if (!token) console.log("Set telegram token env var to start telegram bot. Read docs at https://github.com/patheticGeek/torrent-aio-bot");
-
 if (site && token) {
   const botOptions = dev ? {
     polling: true
@@ -38,10 +30,8 @@ if (site && token) {
   botMethods.setBot(bot);
   console.log("Bot ready");
 }
-
 router.get("/download", (req, res) => {
   const link = req.query.link;
-
   if (!link) {
     res.send({
       error: true,
@@ -61,7 +51,6 @@ router.get("/download", (req, res) => {
 });
 router.get("/status", (req, res) => {
   const link = req.query.link;
-
   if (!link) {
     res.send({
       error: true,
@@ -83,7 +72,6 @@ router.get("/status", (req, res) => {
 });
 router.get("/remove", (req, res) => {
   const link = req.query.link;
-
   if (!link) {
     res.send({
       error: true,

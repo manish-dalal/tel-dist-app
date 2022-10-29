@@ -1,14 +1,10 @@
 "use strict";
 
 const diskinfo = require("./diskinfo");
-
 const humanTime = require("../utils/humanTime");
-
 const prettyBytes = require("./prettyBytes");
-
-async function status(path = "/app") {
+async function status(path) {
   let info = "";
-
   try {
     let dinfo = await diskinfo(path);
     const memory = process.memoryUsage();
@@ -28,5 +24,4 @@ async function status(path = "/app") {
     return info;
   }
 }
-
 module.exports = status;
