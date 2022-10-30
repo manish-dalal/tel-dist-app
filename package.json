@@ -11,7 +11,7 @@
     "build-web": "cd web && npm install && npm run build",
     "build-main": "rm -rf dist && ./node_modules/.bin/babel . --out-dir dist --ignore node_modules,web,config.dev.js,proxy.js && mkdir -p dist/web && cp -r web/build dist/web/build && touch dist/logs.txt",
     "serve": "node dist/index.js",
-    "start": "NODE_ENV=production nodemon dist/index.js",
+    "start": "NODE_ENV=production node dist/index.js",
     "deploy": "npm run build-main && rm -rf ../dist-app/dist && cp package.json .gitignore app.json .babelrc ../dist-app && cp -r dist ../dist-app && rm -rf dist",
     "push": "cd ../dist-app && git add . && git commit -m 'changes' && git push origin master && git push heroku1 master && git push mdiskdoodbot master"
   },

@@ -304,13 +304,19 @@ const processMessages = async bot => {
             let cloudinaryUrl = "";
             const clStr = removeUsername(msg.caption || msg.text);
             if (msg.photo) {
-              const {
-                mimeType,
-                fileName,
-                fileId
-              } = getFileData(msg, activeLinkType);
-              const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
-              imgDriveId = uploadedFile.data.id;
+              try {
+                const {
+                  mimeType,
+                  fileName,
+                  fileId
+                } = getFileData(msg, activeLinkType);
+                console.log("mimeType, fileName, fileId", mimeType, fileName, fileId);
+                const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
+                imgDriveId = uploadedFile.data.id;
+              } catch (error) {
+                console.log("uplaoa img error", error);
+                console.log("great msg", JSON.stringify(msg));
+              }
               const sigData = getCloudinarySignature(`${activeLinkType}1`);
               if (imgDriveId && sigData.apikey && sigData.signature) {
                 try {
