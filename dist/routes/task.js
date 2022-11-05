@@ -11,6 +11,7 @@ const {
 const {
   Logger
 } = require("../utils/winston");
+const getChatMembersCount = require("../utils/getChatMembersCount");
 const serverUrl = config.SERVER_SITE;
 const router = express.Router();
 router.post("/add", async (req, res) => {
@@ -20,7 +21,7 @@ router.post("/add", async (req, res) => {
   body.status = "active";
   const {
     data
-  } = await axios.post(`${serverUrl}/task/`, body);
+  } = await axios.post(`${serverUrl}/task/v1/`, body);
   if (!data) {
     Logger.error("Error Add task");
     res.send({
@@ -40,7 +41,7 @@ router.post("/update", async (req, res) => {
   body.cname = body.cname || "v1";
   const {
     data
-  } = await axios.put(`${serverUrl}/task/${body._id}`, body);
+  } = await axios.put(`${serverUrl}/task/v1/${body._id}`, body);
   if (!data) {
     Logger.error("Error update task");
     res.send({
@@ -58,7 +59,7 @@ router.post("/remove", async (req, res) => {
   const body = req.body;
   const {
     data
-  } = await axios.put(`${serverUrl}/task/${body._id}`, {
+  } = await axios.put(`${serverUrl}/task/v1/${body._id}`, {
     isDeleted: true
   });
   if (!data) {
@@ -78,7 +79,7 @@ router.get("/list", async (req, res) => {
   try {
     const {
       data
-    } = await axios.get(`${serverUrl}/task/list?botToken=${config.TELEGRAM_TOKEN}`);
+    } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}`);
     res.json({
       error: false,
       ...data
@@ -95,72 +96,80 @@ router.post("/start", async (req, res) => {
   try {
     for (const task of req.body) {
       const {
-        size = 40,
-        page = 0,
-        category = "",
+        categoryState = [],
         cname = "v1",
         linkType = "mdisk",
         channelName,
         thumbUrl,
         groupInfo,
         _id,
-        pageIncrementor = 1,
         isEuOrgLink = true,
         isNewMdisk
       } = task;
-      let params = {
-        category,
-        cname,
-        linkType,
-        pageSize: size,
-        page
-      };
-      const url = new URL(`${serverUrl}/message/list`);
-      url.search = new URLSearchParams(params);
-      const messageResponse = await axios.get(url.href);
-      const {
-        totalpages,
-        messages
-      } = messageResponse.data;
-      const parsePage = parseInt(page);
-      const parsepageIncrementor = parseInt(pageIncrementor);
-      const expectedNextPage = parsePage + parsepageIncrementor;
-      const nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
+      const newCategoryState = [];
+      for (let cat of categoryState) {
+        const {
+          size = 40,
+          page = 0,
+          category = "",
+          pageIncrementor = 1
+        } = cat;
+        let params = {
+          category,
+          cname,
+          linkType,
+          pageSize: size,
+          page
+        };
+        const url = new URL(`${serverUrl}/message/list`);
+        url.search = new URLSearchParams(params);
+        const messageResponse = await axios.get(url.href);
+        const {
+          totalpages,
+          messages
+        } = messageResponse.data;
+        console.log("category=", category, "messages", messages.length, "totalpages", totalpages);
+        const parsePage = parseInt(page);
+        const parsepageIncrementor = parseInt(pageIncrementor);
+        const expectedNextPage = parsePage + parsepageIncrementor;
+        const nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
+        newCategoryState.push({
+          ...cat,
+          page: nextPage
+        });
+        messages.forEach(element => {
+          const msg = {
+            ...element,
+            targetChatId: groupInfo.id,
+            thumbUrl,
+            maniChannelName: channelName,
+            isEuOrgLink,
+            isNewMdisk
+          };
+          if (messages[messages.length - 1] === element) {
+            msg["additionalAction"] = async (errorMess = "") => {
+              const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, {
+                status: errorMess || "active",
+                page: nextPage
+              });
+              console.log("taskUpdateRes End", taskUpdateRes.data);
+            };
+          }
+          pushInMessageQueue({
+            msg,
+            mode: iMode.DBMESSAGESENDER
+          });
+        });
+      }
+      const membersCount = await getChatMembersCount(config.TELEGRAM_TOKEN, groupInfo.id);
       let taskUpdatedData = {
         status: "processing",
-        lastExecuted: new Date()
+        lastExecuted: new Date(),
+        membersCount,
+        categoryState: newCategoryState
       };
-      if (!messages.length) {
-        taskUpdatedData = {
-          status: "Reset Active page",
-          page: nextPage
-        };
-      }
-      const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, taskUpdatedData);
+      const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, taskUpdatedData);
       console.log("taskRes start", taskUpdateRes.data);
-      messages.forEach(element => {
-        const msg = {
-          ...element,
-          targetChatId: groupInfo.id,
-          thumbUrl,
-          maniChannelName: channelName,
-          isEuOrgLink,
-          isNewMdisk
-        };
-        if (messages[messages.length - 1] === element) {
-          msg["additionalAction"] = async (errorMess = "") => {
-            const taskUpdateRes = await axios.put(`${serverUrl}/task/${_id}`, {
-              status: errorMess || "active",
-              page: nextPage
-            });
-            console.log("taskUpdateRes End", taskUpdateRes.data);
-          };
-        }
-        pushInMessageQueue({
-          msg,
-          mode: iMode.DBMESSAGESENDER
-        });
-      });
     }
     console.log("Send add response");
     res.json({
@@ -202,7 +211,7 @@ _CHANNEL_
     } = req.query;
     const {
       data
-    } = await axios.get(`${serverUrl}/task/list?botToken=${config.TELEGRAM_TOKEN}`);
+    } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}`);
     const filterData = data.tasks.filter(e => e.linkType === linkType);
     if (text) {
       filterData.forEach(el => {
