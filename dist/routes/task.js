@@ -112,7 +112,8 @@ router.post("/start", async (req, res) => {
           size = 40,
           page = 0,
           category = "",
-          pageIncrementor = 1
+          pageIncrementor = 1,
+          isRealImage = false
         } = cat;
         let params = {
           category,
@@ -138,10 +139,13 @@ router.post("/start", async (req, res) => {
           page: nextPage
         });
         messages.forEach(element => {
+          const thumbUrlObj = isRealImage ? {} : {
+            thumbUrl
+          };
           const msg = {
             ...element,
             targetChatId: groupInfo.id,
-            thumbUrl,
+            ...thumbUrlObj,
             maniChannelName: channelName,
             isEuOrgLink,
             isNewMdisk
@@ -162,10 +166,13 @@ router.post("/start", async (req, res) => {
         });
       }
       const membersCount = await getChatMembersCount(config.TELEGRAM_TOKEN, groupInfo.id);
+      const membersCountObj = membersCount ? {
+        membersCount
+      } : {};
       let taskUpdatedData = {
         status: "processing",
         lastExecuted: new Date(),
-        membersCount,
+        ...membersCountObj,
         categoryState: newCategoryState
       };
       const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, taskUpdatedData);
