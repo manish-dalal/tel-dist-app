@@ -153,8 +153,7 @@ router.post("/start", async (req, res) => {
           if (categoryState[categoryState.length - 1] === cat && messages[messages.length - 1] === element) {
             msg["additionalAction"] = async (errorMess = "") => {
               const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, {
-                status: errorMess || "active",
-                page: nextPage
+                status: errorMess || "active"
               });
               console.log("taskUpdateRes End", taskUpdateRes.data);
             };
