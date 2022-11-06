@@ -150,7 +150,7 @@ router.post("/start", async (req, res) => {
             isEuOrgLink,
             isNewMdisk
           };
-          if (messages[messages.length - 1] === element) {
+          if (categoryState[categoryState.length - 1] === cat && messages[messages.length - 1] === element) {
             msg["additionalAction"] = async (errorMess = "") => {
               const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, {
                 status: errorMess || "active",
