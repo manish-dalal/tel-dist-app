@@ -35,6 +35,7 @@ const config = {
   REMOVE_CHANNEL_NAME: process.env.REMOVE_CHANNEL_NAME,
   ADMIN_USERS: process.env.ADMIN_USERS || "[]",
   TELEGRAM_TOKEN_1: process.env.TELEGRAM_TOKEN_1,
-  DESIGNATION_CHAT: process.env.DESIGNATION_CHAT
+  DESIGNATION_CHAT: process.env.DESIGNATION_CHAT,
+  DEFAULT_FILENAME: process.env.DEFAULT_FILENAME
 };
 module.exports = config;
