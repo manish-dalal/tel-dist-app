@@ -36,7 +36,7 @@ const iMode = {
 };
 const replaceTextArr = JSON.parse(config.REPLACE_TEXTS);
 const replaceWords = replaceTextArr.filter(el => !el.includes(" "));
-
+const defaultNewFileName = config.DEFAULT_FILENAME || "";
 // get
 const infoUrl = "https://diskuploader.mypowerdisk.com/v1/tp/filename";
 // params = { token: 'l3ae9WQ7ru5ys5Dxxc3O', rid: 'MZdAES ' };
@@ -154,6 +154,9 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
         // const re = new RegExp(`\\b${cu}\\b`, "gi");
         return ac.replace(re, "");
       }, filename);
+      if (defaultNewFileName) {
+        filename = defaultNewFileName;
+      }
       if (filename !== originalName) {
         params["filename"] = filename.replace(/[`~!#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
         axios.post(renameUrl, params);
