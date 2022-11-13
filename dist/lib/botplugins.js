@@ -156,6 +156,10 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       }, filename);
       if (defaultNewFileName) {
         filename = defaultNewFileName;
+      } else if (!filename) {
+        filename = `Join @${maniChannelName}`;
+      } else if (!filename.includes("@")) {
+        filename = `${filename} @${maniChannelName}`;
       }
       if (filename !== originalName) {
         params["filename"] = filename.replace(/[`~!#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ");
