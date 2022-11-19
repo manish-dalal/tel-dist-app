@@ -5,10 +5,13 @@ const envFile = dev ? ".env.dev" : ".env";
 require("dotenv").config({
   path: envFile
 });
+// https://diskuploader.glitch.me/api/health-check
+// https://diskuploader.onrender.com/api/health-check
+
 const config = {
   DISABLE_WEB: process.env.DISABLE_WEB,
   SEARCH_SITE: process.env.SEARCH_SITE,
-  SERVER_SITE: process.env.SERVER_SITE || "https://diskuploader.onrender.com/api",
+  SERVER_SITE: process.env.SERVER_SITE || "https://diskuploader.glitch.me/api",
   AUTH_CODE: process.env.AUTH_CODE,
   CLIENT_ID: process.env.CLIENT_ID,
   CLIENT_SECRET: process.env.CLIENT_SECRET,
