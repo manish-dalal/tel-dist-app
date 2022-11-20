@@ -7,7 +7,7 @@ const {
   getProcessStats
 } = require("../lib/botplugins");
 const KEEPLIVE_SITE = `${config.SERVER_SITE}/keepalive`;
-// let KEEPLIVE_TIME = config.KEEPLIVE_TIME || 100;
+let KEEPLIVE_TIME = config.KEEPLIVE_TIME || 120;
 const KEEPLIVE_INTERVAL = config.KEEPLIVE_INTERVAL || 280000;
 let LAST_KEEPLIVE_TIME = new Date();
 function addMinutes(date, minutes) {
@@ -26,12 +26,14 @@ function keepalive() {
         nextData = 0
       } = getProcessStats();
       const currentTime = new Date().getTime();
+      const nextSleepTime = addMinutes(lastRequestTime, KEEPLIVE_TIME).getTime();
       const afterLastRequestTime = addMinutes(lastRequestTime, 4).getTime();
       console.log("Last keeplive request is", humanTime(currentTime - LAST_KEEPLIVE_TIME.getTime()));
       console.log("Bot last request is", humanTime(currentTime - lastRequestTime.getTime()));
-      console.log(`condition 1`, total - current > 10, "===", nextData);
+      console.log(`condition 1`, total - current > 10, "===", nextData, "nextSleepTime", nextSleepTime > currentTime);
       console.log(`condition 2`, currentTime > afterLastRequestTime);
-      if ((total - current > 10 || nextData) && currentTime > afterLastRequestTime) {
+      // && currentTime > afterLastRequestTime
+      if (total - current > 10 || nextData || nextSleepTime > currentTime) {
         try {
           let params = {
             url: config.SITE
