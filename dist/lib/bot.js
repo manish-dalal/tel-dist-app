@@ -142,6 +142,9 @@ function bot(torrent, bot) {
         }, {
           text: "Doodstream",
           callback_data: "dood"
+        }, {
+          text: "Vivdisk",
+          callback_data: "vivdisk"
         }]]
       };
       const opts = {
@@ -172,6 +175,9 @@ function bot(torrent, bot) {
         }, {
           text: "Tango&onlyfans",
           callback_data: 6
+        }], [{
+          text: "18 plus",
+          callback_data: 7
         }]]
       };
       const opts = {
