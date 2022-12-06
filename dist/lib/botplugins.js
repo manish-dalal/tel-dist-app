@@ -173,6 +173,14 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       const filecode = _.get(res, "data.result.filecode", _.get(res, "data.msg", ""));
       const newLink = filecode !== "No file" ? "https://dood.sh/d/" + filecode : "";
       return newLink;
+    } else if (link.toLowerCase().includes("vivdisk") && config.VIVDISK_TOKEN) {
+      const reqUrl = `https://vivdisk.com/clone/clone.php?url=${link}&api=${config.VIVDISK_TOKEN}`;
+      const res = await axios.get(reqUrl, {
+        transformResponse: r => r
+      });
+      const newLink = _.get(res, "res.data", "").trim();
+      console.log("mdisk data", newLink);
+      return newLink;
     } else {
       return "";
     }
@@ -205,6 +213,7 @@ const duplicateFinder = async link => {
       if (mdiskLinkInfo.source) {
         params["source"] = mdiskLinkInfo.source;
       }
+      params.linkType = "mdisk";
     } else if (link.includes("dood.")) {
       const {
         data: res1
@@ -212,6 +221,9 @@ const duplicateFinder = async link => {
       const info = _.get(res1, "result[0]", {});
       params.length = info.length;
       params.title = info.title;
+      params.linkType = "dood";
+    } else if (link.toLowerCase().includes("vivdisk") && config.VIVDISK_TOKEN) {
+      params.linkType = "vivdisk";
     }
     let u_url = link;
     if (mongoApiUrl) {

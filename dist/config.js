@@ -39,6 +39,7 @@ const config = {
   ADMIN_USERS: process.env.ADMIN_USERS || "[]",
   TELEGRAM_TOKEN_1: process.env.TELEGRAM_TOKEN_1,
   DESIGNATION_CHAT: process.env.DESIGNATION_CHAT,
+  VIVDISK_TOKEN: process.env.VIVDISK_TOKEN,
   DEFAULT_FILENAME: process.env.DEFAULT_FILENAME
 };
 module.exports = config;
