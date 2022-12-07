@@ -121,6 +121,30 @@ const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChann
   });
   return finalStr.join("\n");
 };
+const convertVivdiskLink = async (link, attempt) => {
+  let resData = "";
+  try {
+    const reqUrl = `https://vivdisk.com/clone/clone.php?url=${link}&api=${config.VIVDISK_TOKEN}`;
+    const response = await axios.get(reqUrl, {
+      transformResponse: r => r,
+      timeout: 1000 * 15
+    });
+    resData = _.get(response, "data", "").trim();
+  } catch (error) {}
+  if (resData) {
+    return {
+      link: resData,
+      attempt
+    };
+  } else if (attempt < 5) {
+    return convertVivdiskLink(link, attempt + 1);
+  } else {
+    return {
+      link: resData,
+      attempt: attempt + 1
+    };
+  }
+};
 const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
   let link = url;
   try {
@@ -174,11 +198,9 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       const newLink = filecode !== "No file" ? "https://dood.sh/d/" + filecode : "";
       return newLink;
     } else if (link.toLowerCase().includes("vivdisk") && config.VIVDISK_TOKEN) {
-      const reqUrl = `https://vivdisk.com/clone/clone.php?url=${link}&api=${config.VIVDISK_TOKEN}`;
-      const res = await axios.get(reqUrl, {
-        transformResponse: r => r
-      });
-      const newLink = _.get(res, "res.data", "").trim();
+      const {
+        link: newLink
+      } = await convertVivdiskLink(link, 1);
       console.log("mdisk data", newLink);
       return newLink;
     } else {
