@@ -136,7 +136,7 @@ const convertVivdiskLink = async (link, attempt) => {
       link: resData,
       attempt
     };
-  } else if (attempt < 5) {
+  } else if (attempt < 10) {
     return convertVivdiskLink(link, attempt + 1);
   } else {
     return {
