@@ -121,6 +121,7 @@ const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChann
   });
   return finalStr.join("\n");
 };
+const maxAttemptCount = parseInt(config.VIVDISK_RETRY) || 10;
 const convertVivdiskLink = async (link, attempt) => {
   let resData = "";
   try {
@@ -136,7 +137,7 @@ const convertVivdiskLink = async (link, attempt) => {
       link: resData,
       attempt
     };
-  } else if (attempt < 10) {
+  } else if (attempt < maxAttemptCount) {
     return convertVivdiskLink(link, attempt + 1);
   } else {
     return {
@@ -199,9 +200,10 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       return newLink;
     } else if (link.toLowerCase().includes("vivdisk") && config.VIVDISK_TOKEN) {
       const {
-        link: newLink
+        link: newLink,
+        attempt
       } = await convertVivdiskLink(link, 1);
-      console.log("mdisk data", newLink);
+      console.log("attempt", attempt, "mdisk data", newLink);
       return newLink;
     } else {
       return "";

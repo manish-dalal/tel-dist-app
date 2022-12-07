@@ -40,6 +40,7 @@ const config = {
   TELEGRAM_TOKEN_1: process.env.TELEGRAM_TOKEN_1,
   DESIGNATION_CHAT: process.env.DESIGNATION_CHAT,
   VIVDISK_TOKEN: process.env.VIVDISK_TOKEN,
+  VIVDISK_RETRY: process.env.VIVDISK_RETRY,
   DEFAULT_FILENAME: process.env.DEFAULT_FILENAME
 };
 module.exports = config;
