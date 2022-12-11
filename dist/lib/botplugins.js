@@ -459,11 +459,25 @@ const processMessages = async bot => {
             const opts = {
               caption: clStr.slice(0, 1025)
             };
+            let channelButtons = [{
+              text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
+              url: `https://t.me/${maniChannelName}`
+            }];
+            const {
+              BACKUP_CHANNEL_LINK = "",
+              ALL_CHANNEL_LINK = ""
+            } = config;
+            if (BACKUP_CHANNEL_LINK && ALL_CHANNEL_LINK) {
+              channelButtons = [{
+                text: "🙏 Backup Channel",
+                url: BACKUP_CHANNEL_LINK
+              }, {
+                text: "🔞👉 All Channel Link",
+                url: ALL_CHANNEL_LINK
+              }];
+            }
             opts["reply_markup"] = {
-              inline_keyboard: [[{
-                text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
-                url: `https://t.me/${maniChannelName}`
-              }]]
+              inline_keyboard: [channelButtons]
             };
             const botFinal = await getBotInstanseAndSleep({
               bot,

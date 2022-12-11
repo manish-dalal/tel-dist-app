@@ -41,6 +41,8 @@ const config = {
   DESIGNATION_CHAT: process.env.DESIGNATION_CHAT,
   VIVDISK_TOKEN: process.env.VIVDISK_TOKEN,
   VIVDISK_RETRY: process.env.VIVDISK_RETRY,
-  DEFAULT_FILENAME: process.env.DEFAULT_FILENAME
+  DEFAULT_FILENAME: process.env.DEFAULT_FILENAME,
+  BACKUP_CHANNEL_LINK: process.env.BACKUP_CHANNEL_LINK,
+  ALL_CHANNEL_LINK: process.env.ALL_CHANNEL_LINK
 };
 module.exports = config;
