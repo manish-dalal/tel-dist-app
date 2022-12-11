@@ -139,6 +139,11 @@ const convertVivdiskLink = async (link, attempt) => {
     };
   } else if (attempt < maxAttemptCount) {
     return convertVivdiskLink(link, attempt + 1);
+  } else if (resData.includes("data null")) {
+    return {
+      link: "",
+      attempt: attempt + 1
+    };
   } else {
     return {
       link: resData,
