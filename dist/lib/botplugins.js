@@ -459,14 +459,12 @@ const processMessages = async bot => {
             const opts = {
               caption: clStr.slice(0, 1025)
             };
-            if (additionalAction) {
-              opts["reply_markup"] = {
-                inline_keyboard: [[{
-                  text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
-                  url: `https://t.me/${maniChannelName}`
-                }]]
-              };
-            }
+            opts["reply_markup"] = {
+              inline_keyboard: [[{
+                text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
+                url: `https://t.me/${maniChannelName}`
+              }]]
+            };
             const botFinal = await getBotInstanseAndSleep({
               bot,
               chatId: targetChatId
