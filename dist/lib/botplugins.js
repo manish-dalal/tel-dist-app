@@ -488,7 +488,9 @@ const processMessages = async bot => {
               const tempUrl = `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
               imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${(Math.random() * 100).toFixed()}` : tempUrl);
               console.log("imageUrl##", imageUrl);
-              const sendData = await botFinal.sendPhoto(targetChatId, imageUrl, opts);
+              if (opts.caption) {
+                const sendData = await botFinal.sendPhoto(targetChatId, imageUrl, opts);
+              }
               // console.log("sendData###", sendData);
             } else {
               await botFinal.sendMessage(targetChatId, clStr);
