@@ -251,8 +251,10 @@ const duplicateFinder = async link => {
       params.length = info.length;
       params.title = info.title;
       params.linkType = "dood";
-    } else if (link.toLowerCase().includes("vivdisk") && config.VIVDISK_TOKEN) {
+    } else if (link.toLowerCase().includes("vivdisk")) {
       params.linkType = "vivdisk";
+    } else if (link.toLowerCase().includes("terabox")) {
+      params.linkType = "terabox";
     }
     let u_url = link;
     if (mongoApiUrl) {

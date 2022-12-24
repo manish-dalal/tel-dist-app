@@ -142,9 +142,12 @@ function bot(torrent, bot) {
         }, {
           text: "Doodstream",
           callback_data: "dood"
-        }, {
+        }], [{
           text: "Vivdisk",
           callback_data: "vivdisk"
+        }, {
+          text: "Terabox",
+          callback_data: "terabox"
         }]]
       };
       const opts = {
