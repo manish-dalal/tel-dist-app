@@ -32,7 +32,8 @@ const iMode = {
   MDISKDUPLICATE: 6,
   SAVEDB: 7,
   DBMESSAGESENDER: 121,
-  MESSAGEINFO: 8
+  MESSAGEINFO: 8,
+  DUPLICATE_REMOVE_MDISK: 9
 };
 const replaceTextArr = JSON.parse(config.REPLACE_TEXTS);
 const replaceWords = replaceTextArr.filter(el => !el.includes(" "));
@@ -51,7 +52,7 @@ const getDateString = () => {
   const dateStr = `(${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)})`;
   return timestr + dateStr;
 };
-const getFileData = (msg, activeLinkType) => {
+const getFileData = (msg, activeLinkType, cname = "") => {
   let mimeType = "";
   let fileName = "";
   let fileId = "";
@@ -70,7 +71,7 @@ const getFileData = (msg, activeLinkType) => {
   } else if (msg.photo) {
     const lastPhoto = msg.photo[msg.photo.length - 1];
     mimeType = (lastPhoto === null || lastPhoto === void 0 ? void 0 : lastPhoto.mimeType) || "image/jpeg";
-    fileName = `${activeLinkType}-${getDateString()}-${msg.message_id}.jpeg`;
+    fileName = `${activeLinkType}${cname ? "-" + cname : ""}-${getDateString()}-${msg.message_id}.jpeg`;
     fileId = lastPhoto.file_id;
   }
   return {
@@ -301,6 +302,9 @@ const getConvertedLink = async (urls, mode) => {
           const temp_link = await mdiskUp(i);
           converted_link = temp_link ? await duplicateFinder(temp_link) : "";
           break;
+        case iMode.DUPLICATE_REMOVE_MDISK:
+          converted_link = !i.includes("mdisk") ? await duplicateFinder(i) : "";
+          break;
       }
       urls_dict[i] = converted_link;
       new_urls.push(converted_link);
@@ -359,7 +363,7 @@ const processMessages = async bot => {
                   mimeType,
                   fileName,
                   fileId
-                } = getFileData(msg, activeLinkType);
+                } = getFileData(msg, activeLinkType, config.CNAME);
                 console.log("mimeType, fileName, fileId", mimeType, fileName, fileId);
                 const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
                 imgDriveId = uploadedFile.data.id;
