@@ -223,6 +223,12 @@ function bot(torrent, bot) {
         }, {
           text: "Get Message info",
           callback_data: iMode.MESSAGEINFO
+        }], [{
+          text: "D+M Link remover",
+          callback_data: iMode.DUPLICATE_REMOVE_MDISK
+        }, {
+          text: "C+M remover",
+          callback_data: iMode.CHANNEL_M_REMOVER
         }]]
       };
       const opts = {

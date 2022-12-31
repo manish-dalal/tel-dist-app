@@ -33,7 +33,8 @@ const iMode = {
   SAVEDB: 7,
   DBMESSAGESENDER: 121,
   MESSAGEINFO: 8,
-  DUPLICATE_REMOVE_MDISK: 9
+  DUPLICATE_REMOVE_MDISK: 9,
+  CHANNEL_M_REMOVER: 10
 };
 const replaceTextArr = JSON.parse(config.REPLACE_TEXTS);
 const replaceWords = replaceTextArr.filter(el => !el.includes(" "));
@@ -304,6 +305,9 @@ const getConvertedLink = async (urls, mode) => {
           break;
         case iMode.DUPLICATE_REMOVE_MDISK:
           converted_link = !i.includes("mdisk") ? await duplicateFinder(i) : "";
+          break;
+        case iMode.CHANNEL_M_REMOVER:
+          converted_link = i.includes("mdisk") ? "" : i;
           break;
       }
       urls_dict[i] = converted_link;
