@@ -417,7 +417,7 @@ const processMessages = async bot => {
           } catch (error) {
             Logger.error(error.message || "SaveMsg error occured");
           }
-        } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER) {
+        } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER || mode === iMode.DUPLICATE_REMOVE_MDISK || mode === iMode.CHANNEL_M_REMOVER) {
           // link conversion
           const designationChat = config.DESIGNATION_CHAT || "";
           if ((mode === iMode.MDISK || mode === iMode.MDISKDUPLICATE) && designationChat) {
