@@ -34,7 +34,7 @@ const iMode = {
   DBMESSAGESENDER: 121,
   MESSAGEINFO: 8,
   DUPLICATE_REMOVE_MDISK: 9,
-  CHANNEL_M_REMOVER: 10
+  CHANNEL_REMOVER_KEEP_TERABOX: 10
 };
 const replaceTextArr = JSON.parse(config.REPLACE_TEXTS);
 const replaceWords = replaceTextArr.filter(el => !el.includes(" "));
@@ -306,8 +306,8 @@ const getConvertedLink = async (urls, mode) => {
         case iMode.DUPLICATE_REMOVE_MDISK:
           converted_link = !i.includes("mdisk") ? await duplicateFinder(i) : "";
           break;
-        case iMode.CHANNEL_M_REMOVER:
-          converted_link = i.includes("mdisk") ? "" : i;
+        case iMode.CHANNEL_REMOVER_KEEP_TERABOX:
+          converted_link = i.includes("terabox") ? i : "";
           break;
       }
       urls_dict[i] = converted_link;
@@ -417,7 +417,7 @@ const processMessages = async bot => {
           } catch (error) {
             Logger.error(error.message || "SaveMsg error occured");
           }
-        } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER || mode === iMode.DUPLICATE_REMOVE_MDISK || mode === iMode.CHANNEL_M_REMOVER) {
+        } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER || mode === iMode.DUPLICATE_REMOVE_MDISK || mode === iMode.CHANNEL_REMOVER_KEEP_TERABOX) {
           // link conversion
           const designationChat = config.DESIGNATION_CHAT || "";
           if ((mode === iMode.MDISK || mode === iMode.MDISKDUPLICATE) && designationChat) {

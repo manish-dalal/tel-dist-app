@@ -227,8 +227,8 @@ function bot(torrent, bot) {
           text: "D+M Link remover",
           callback_data: iMode.DUPLICATE_REMOVE_MDISK
         }, {
-          text: "C+M remover",
-          callback_data: iMode.CHANNEL_M_REMOVER
+          text: "C Remove Keep terabox",
+          callback_data: iMode.CHANNEL_REMOVER_KEEP_TERABOX
         }]]
       };
       const opts = {
