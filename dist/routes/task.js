@@ -104,7 +104,8 @@ router.post("/start", async (req, res) => {
         groupInfo,
         _id,
         isEuOrgLink = true,
-        isNewMdisk
+        isNewMdisk,
+        useCustomMessage
       } = task;
       const newCategoryState = [];
       for (let cat of categoryState) {
@@ -148,7 +149,8 @@ router.post("/start", async (req, res) => {
             ...thumbUrlObj,
             maniChannelName: channelName,
             isEuOrgLink,
-            isNewMdisk
+            isNewMdisk,
+            useCustomMessage
           };
           if (categoryState[categoryState.length - 1] === cat && messages[messages.length - 1] === element) {
             msg["additionalAction"] = async (errorMess = "") => {

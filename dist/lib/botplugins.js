@@ -18,7 +18,11 @@ const {
 } = require("../utils/getCloudinarySignature");
 const humanTime = require("../utils/humanTime");
 const {
-  getBotInstanseAndSleep
+  getBotInstanseAndSleep,
+  sendMessage,
+  getFileData,
+  sleep,
+  convertMessageBody
 } = require("./botMethods");
 let dataArray = [];
 let isMessageProcessing = false;
@@ -47,43 +51,6 @@ const renameUrl = "https://diskuploader.mypowerdisk.com/v1/tp/info";
 // param = {'token': 'l3ae9WQ7ru5ys5Dxxc3O','rid':'MZdAES','filename':'name_1'}
 
 const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL || "https://data.mongodb-api.com/app/tracker1-smsai/endpoint";
-const getDateString = () => {
-  const date = new Date();
-  const timestr = `${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
-  const dateStr = `(${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)})`;
-  return timestr + dateStr;
-};
-const getFileData = (msg, activeLinkType, cname = "") => {
-  let mimeType = "";
-  let fileName = "";
-  let fileId = "";
-  if (msg.document) {
-    mimeType = msg.document.mimeType;
-    fileName = msg.document.file_name;
-    fileId = msg.document.file_id;
-  } else if (msg.video) {
-    mimeType = msg.video.mimeType;
-    fileName = msg.video.file_name;
-    fileId = msg.video.file_id;
-  } else if (msg.audio) {
-    mimeType = msg.audio.mimeType;
-    fileName = msg.audio.file_name;
-    fileId = msg.audio.file_id;
-  } else if (msg.photo) {
-    const lastPhoto = msg.photo[msg.photo.length - 1];
-    mimeType = (lastPhoto === null || lastPhoto === void 0 ? void 0 : lastPhoto.mimeType) || "image/jpeg";
-    fileName = `${activeLinkType}${cname ? "-" + cname : ""}-${getDateString()}-${msg.message_id}.jpeg`;
-    fileId = lastPhoto.file_id;
-  }
-  return {
-    mimeType,
-    fileName,
-    fileId
-  };
-};
-const sleep = ms => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
 const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChannelName = false) => {
   // console.log("dddffff", _.get(config, "REMOVE_CHANNEL_NAME", true));
   // true Not remove name
@@ -316,19 +283,38 @@ const getConvertedLink = async (urls, mode) => {
   }
   return new_urls;
 };
-const multiLinkCon = async (mlStr, mode, maniChannelName = config.CHANNEL) => {
+const multiLinkCon = async ({
+  mlStr,
+  mode,
+  maniChannelName = config.CHANNEL,
+  isSplit = false,
+  useCustomMessage = false
+}) => {
   const clStr = removeUsername(mlStr, maniChannelName);
   var urlRegex = /(https?:\/\/[^\s]+)/g;
   const urls = clStr.match(urlRegex);
-  const newUrls = await getConvertedLink(urls, mode);
-  if (!newUrls.filter(n => n).length) {
+  let newUrls = await getConvertedLink(urls, mode);
+  newUrls = newUrls.filter(n => n);
+  let finalArr = [];
+  if (!newUrls.length) {
     // No link in msg
     return "";
   }
-  const finalStr = urls.reduce((acStr, element, index) => {
-    return acStr.replace(urls[index], newUrls[index]);
-  }, clStr);
-  return finalStr;
+  if (isSplit) {
+    const spliterNum = 10;
+    const noOfSavedMessages = Math.ceil(newUrls.length / spliterNum);
+    [...Array(noOfSavedMessages)].forEach((e, conut) => {
+      const splitArr = newUrls.slice(conut * spliterNum, (conut + 1) * spliterNum);
+      const finalStr = convertMessageBody(splitArr);
+      finalArr.push(finalStr);
+    });
+    return finalArr;
+  } else {
+    const finalStr = useCustomMessage ? convertMessageBody(newUrls) : urls.reduce((acStr, element, index) => {
+      return acStr.replace(urls[index], newUrls[index]);
+    }, clStr);
+    return finalStr;
+  }
 };
 const processMessages = async bot => {
   // console.log("isMessageProcessing", isMessageProcessing);
@@ -417,31 +403,38 @@ const processMessages = async bot => {
           } catch (error) {
             Logger.error(error.message || "SaveMsg error occured");
           }
-        } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER || mode === iMode.DUPLICATE_REMOVE_MDISK || mode === iMode.CHANNEL_REMOVER_KEEP_TERABOX) {
+        } else if (mode === iMode.MDISK || mode === iMode.DUPLICATE || mode === iMode.COIN || mode === iMode.MDISKDUPLICATE || mode === iMode.CHANNELREMOVER || mode === iMode.DUPLICATE_REMOVE_MDISK) {
           // link conversion
           const designationChat = config.DESIGNATION_CHAT || "";
           if ((mode === iMode.MDISK || mode === iMode.MDISKDUPLICATE) && designationChat) {
             chatId = designationChat;
           }
-          const convertedStr = await multiLinkCon(msg.caption || msg.text, mode);
-          if ((msg.document || msg.video || msg.audio || msg.photo) && convertedStr) {
-            const {
-              fileId
-            } = getFileData(msg);
-            const opts = {
-              caption: convertedStr
-            };
-            if (msg.document) {
-              await bot.sendDocument(chatId, fileId, opts);
-            } else if (msg.video) {
-              await bot.sendVideo(chatId, fileId, opts);
-            } else if (msg.audio) {
-              await bot.sendAudio(chatId, fileId, opts);
-            } else if (msg.photo) {
-              await bot.sendPhoto(chatId, fileId, opts);
-            }
-          } else if (msg.text && convertedStr) {
-            await bot.sendMessage(chatId, convertedStr);
+          const convertedStr = await multiLinkCon({
+            mlStr: msg.caption || msg.text,
+            mode
+          });
+          await sendMessage({
+            msg,
+            convertedStr,
+            bot,
+            chatId
+          });
+        } else if (mode === iMode.CHANNEL_REMOVER_KEEP_TERABOX) {
+          // link conversion
+          const convertedArr = await multiLinkCon({
+            mlStr: msg.caption || msg.text,
+            mode,
+            isSplit: true
+          });
+          console.log("convertedArr", convertedArr);
+          for (const ind of convertedArr) {
+            await sleep(0.2);
+            await sendMessage({
+              msg,
+              convertedStr: ind,
+              bot,
+              chatId
+            });
           }
         } else if (mode === iMode.THUMB) {
           const clStr = removeUsername(msg.caption || msg.text);
@@ -461,11 +454,26 @@ const processMessages = async bot => {
               isNewMdisk = false,
               isEuOrgLink = true,
               cloudinaryUrl,
-              ignoreRemoveChannelName = false
+              ignoreRemoveChannelName = false,
+              useCustomMessage = false
             } = msg;
             let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, true);
-            const clStrTemp = isNewMdisk ? await multiLinkCon(clStr, iMode.MDISK, maniChannelName) : clStr;
-            clStr = isEuOrgLink ? await multiLinkCon(clStrTemp, iMode.COIN, maniChannelName) : clStrTemp;
+            const clStrTemp = isNewMdisk ? await multiLinkCon({
+              mlStr: clStr,
+              mode: iMode.MDISK,
+              maniChannelName
+            }) : clStr;
+            clStr = isEuOrgLink ? await multiLinkCon({
+              mlStr: clStrTemp,
+              mode: iMode.COIN,
+              maniChannelName
+            }) : clStrTemp;
+            clStr = useCustomMessage ? await multiLinkCon({
+              mlStr: clStr,
+              mode: iMode.CHANNELREMOVER,
+              maniChannelName,
+              useCustomMessage: true
+            }) : clStr;
             const opts = {
               caption: clStr.slice(0, 1025)
             };

@@ -2,6 +2,12 @@
 
 const telegram = require("node-telegram-bot-api");
 const config = require("../config");
+const getDateString = () => {
+  const date = new Date();
+  const timestr = `${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
+  const dateStr = `(${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)})`;
+  return timestr + dateStr;
+};
 const token = config.TELEGRAM_TOKEN_1;
 let bot1 = null;
 if (token && !bot1) {
@@ -69,10 +75,77 @@ const getBotInstanseAndSleep = async ({
   lastTelgramSendRequest = new Date();
   return bot;
 };
+const getFileData = (msg, activeLinkType, cname = "") => {
+  let mimeType = "";
+  let fileName = "";
+  let fileId = "";
+  if (msg.document) {
+    mimeType = msg.document.mimeType;
+    fileName = msg.document.file_name;
+    fileId = msg.document.file_id;
+  } else if (msg.video) {
+    mimeType = msg.video.mimeType;
+    fileName = msg.video.file_name;
+    fileId = msg.video.file_id;
+  } else if (msg.audio) {
+    mimeType = msg.audio.mimeType;
+    fileName = msg.audio.file_name;
+    fileId = msg.audio.file_id;
+  } else if (msg.photo) {
+    const lastPhoto = msg.photo[msg.photo.length - 1];
+    mimeType = (lastPhoto === null || lastPhoto === void 0 ? void 0 : lastPhoto.mimeType) || "image/jpeg";
+    fileName = `${activeLinkType}${cname ? "-" + cname : ""}-${getDateString()}-${msg.message_id}.jpeg`;
+    fileId = lastPhoto.file_id;
+  }
+  return {
+    mimeType,
+    fileName,
+    fileId
+  };
+};
+const sendMessage = async ({
+  msg,
+  convertedStr,
+  bot,
+  chatId
+}) => {
+  if ((msg.document || msg.video || msg.audio || msg.photo) && convertedStr) {
+    const {
+      fileId
+    } = getFileData(msg);
+    const opts = {
+      caption: convertedStr
+    };
+    if (msg.document) {
+      await bot.sendDocument(chatId, fileId, opts);
+    } else if (msg.video) {
+      await bot.sendVideo(chatId, fileId, opts);
+    } else if (msg.audio) {
+      await bot.sendAudio(chatId, fileId, opts);
+    } else if (msg.photo) {
+      await bot.sendPhoto(chatId, fileId, opts);
+    }
+  } else if (msg.text && convertedStr) {
+    await bot.sendMessage(chatId, convertedStr);
+  }
+};
+const convertMessageBody = links => {
+  const header = config.MESSAGE_HEADER || "📥 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐋𝐢𝐧𝐤𝐬/👀𝐖𝐚𝐭𝐜𝐡 𝐎𝐧𝐥𝐢𝐧𝐞\n\n";
+  const footer = config.MESSAGE_FOOTER || `#𝗦𝗘𝗔𝗥𝗖𝗛 𝐓𝐆 ➤ @primexmov 🔍\n⬤▬▬▬▬▬▬▬▬▬▬▬▬▬⬤\nhttps://t.me/primexmov`;
+  let str = header;
+  links.forEach((el, index) => {
+    str = `${str}Video ${index + 1}. 👉 ${el} \n\n`;
+  });
+  str = `${str}\n${footer}`;
+  return str;
+};
 module.exports = {
   setBot,
   approveChatJoinRequest,
   declineChatJoinRequest,
   getBotInstanseAndSleep,
-  sleep
+  sleep,
+  getFileData,
+  sendMessage,
+  convertMessageBody
 };
