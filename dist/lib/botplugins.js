@@ -426,7 +426,6 @@ const processMessages = async bot => {
             mode,
             isSplit: true
           });
-          console.log("convertedArr", convertedArr);
           for (const ind of convertedArr) {
             await sleep(0.2);
             await sendMessage({

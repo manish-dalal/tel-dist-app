@@ -43,6 +43,8 @@ const config = {
   VIVDISK_RETRY: process.env.VIVDISK_RETRY,
   DEFAULT_FILENAME: process.env.DEFAULT_FILENAME,
   BACKUP_CHANNEL_LINK: process.env.BACKUP_CHANNEL_LINK,
-  ALL_CHANNEL_LINK: process.env.ALL_CHANNEL_LINK
+  ALL_CHANNEL_LINK: process.env.ALL_CHANNEL_LINK,
+  MESSAGE_HEADER: process.env.MESSAGE_HEADER,
+  MESSAGE_FOOTER: process.env.MESSAGE_FOOTER
 };
 module.exports = config;
