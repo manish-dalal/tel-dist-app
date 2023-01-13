@@ -105,7 +105,8 @@ router.post("/start", async (req, res) => {
         _id,
         isEuOrgLink = true,
         isNewMdisk,
-        useCustomMessage
+        useCustomMessage,
+        numberOfTimes = 1
       } = task;
       const newCategoryState = [];
       for (let cat of categoryState) {
@@ -123,23 +124,29 @@ router.post("/start", async (req, res) => {
           pageSize: size,
           page
         };
-        const url = new URL(`${serverUrl}/message/list`);
-        url.search = new URLSearchParams(params);
-        const messageResponse = await axios.get(url.href);
-        const {
-          totalpages,
-          messages
-        } = messageResponse.data;
-        console.log("category=", category, "messages", messages.length, "totalpages", totalpages);
-        const parsePage = parseInt(page);
-        const parsepageIncrementor = parseInt(pageIncrementor);
-        const expectedNextPage = parsePage + parsepageIncrementor;
-        const nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
+        const fetchMessages = [];
+        let nextPage = 0;
+        for (const [index, v] of Array(numberOfTimes).entries()) {
+          const parsepageIncrementor = parseInt(pageIncrementor);
+          const parsePage = parseInt(params.page);
+          const url = new URL(`${serverUrl}/message/list`);
+          url.search = new URLSearchParams(params);
+          const messageResponse = await axios.get(url.href);
+          const {
+            totalpages,
+            messages
+          } = messageResponse.data;
+          console.log("category=", category, "messages", messages.length, "totalpages", totalpages);
+          const expectedNextPage = parsePage + parsepageIncrementor * index;
+          nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
+          params.page = nextPage;
+          fetchMessages.push(...messages);
+        }
         newCategoryState.push({
           ...cat,
           page: nextPage
         });
-        messages.forEach(element => {
+        fetchMessages.forEach(element => {
           const thumbUrlObj = isRealImage ? {} : {
             thumbUrl
           };
@@ -152,7 +159,7 @@ router.post("/start", async (req, res) => {
             isNewMdisk,
             useCustomMessage
           };
-          if (categoryState[categoryState.length - 1] === cat && messages[messages.length - 1] === element) {
+          if (categoryState[categoryState.length - 1] === cat && fetchMessages[fetchMessages.length - 1] === element) {
             msg["additionalAction"] = async (errorMess = "") => {
               const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, {
                 status: errorMess || "active"

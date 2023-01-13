@@ -94,7 +94,7 @@ const maxAttemptCount = parseInt(config.VIVDISK_RETRY) || 10;
 const convertVivdiskLink = async (link, attempt) => {
   let resData = "";
   try {
-    const reqUrl = `https://vivdisk.com/clone/clone.php?url=${link}&api=${config.VIVDISK_TOKEN}`;
+    const reqUrl = `https://vivdisk.com/clone.php?url=${link}&api=${config.VIVDISK_TOKEN}`;
     const response = await axios.get(reqUrl, {
       transformResponse: r => r,
       timeout: 1000 * 15
@@ -310,7 +310,12 @@ const multiLinkCon = async ({
     });
     return finalArr;
   } else {
-    const finalStr = useCustomMessage ? convertMessageBody(newUrls) : urls.reduce((acStr, element, index) => {
+    let convMsg;
+    if (useCustomMessage) {
+      convMsg = convertMessageBody(newUrls);
+      convMsg = removeUsername(convMsg, maniChannelName);
+    }
+    const finalStr = useCustomMessage ? convMsg : urls.reduce((acStr, element, index) => {
       return acStr.replace(urls[index], newUrls[index]);
     }, clStr);
     return finalStr;
