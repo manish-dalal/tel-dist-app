@@ -2,6 +2,8 @@
 
 const telegram = require("node-telegram-bot-api");
 const config = require("../config");
+const Xray = require("x-ray");
+const xClient = Xray();
 const getDateString = () => {
   const date = new Date();
   const timestr = `${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
@@ -139,6 +141,15 @@ const convertMessageBody = links => {
   str = `${str}\n${footer}`;
   return str;
 };
+const getVivdiskTitle = url => {
+  return new Promise((resolve, reject) => {
+    xClient(url, ".video-durations@html")(function (err, title) {
+      if (err) reject(err);
+      console.log(title);
+      return resolve(title);
+    });
+  });
+};
 module.exports = {
   setBot,
   approveChatJoinRequest,
@@ -147,5 +158,6 @@ module.exports = {
   sleep,
   getFileData,
   sendMessage,
+  getVivdiskTitle,
   convertMessageBody
 };

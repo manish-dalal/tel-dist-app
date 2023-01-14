@@ -22,7 +22,8 @@ const {
   sendMessage,
   getFileData,
   sleep,
-  convertMessageBody
+  convertMessageBody,
+  getVivdiskTitle
 } = require("./botMethods");
 let dataArray = [];
 let isMessageProcessing = false;
@@ -90,11 +91,25 @@ const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChann
   });
   return finalStr.join("\n");
 };
-const maxAttemptCount = parseInt(config.VIVDISK_RETRY) || 10;
-const convertVivdiskLink = async (link, attempt) => {
+const maxAttemptCount = parseInt(config.VIVDISK_RETRY) || 1;
+const convertVivdiskLink = async (link, attempt, maniChannelName) => {
   let resData = "";
+  const originalName = await getVivdiskTitle(link);
+  console.log("originalName", originalName);
+  let filename = emojiStrip(originalName).replace(/@.[a-zA-Z0-9_-]*/g, `@${maniChannelName}`);
+  filename = replaceWords.reduce((ac, cu) => {
+    const re = new RegExp(cu, "gi");
+    return ac.replace(re, "");
+  }, filename);
+  if (defaultNewFileName) {
+    filename = defaultNewFileName;
+  } else if (!filename) {
+    filename = `Join @${maniChannelName}`;
+  } else if (!filename.includes("@")) {
+    filename = `${filename} @${maniChannelName}`;
+  }
   try {
-    const reqUrl = `https://vivdisk.com/clone.php?url=${link}&api=${config.VIVDISK_TOKEN}`;
+    const reqUrl = `https://vivdisk.com/rename.php?url=${link}&api=${config.VIVDISK_TOKEN}&name=${originalName}`;
     const response = await axios.get(reqUrl, {
       transformResponse: r => r,
       timeout: 1000 * 15
@@ -107,7 +122,7 @@ const convertVivdiskLink = async (link, attempt) => {
       attempt
     };
   } else if (attempt < maxAttemptCount) {
-    return convertVivdiskLink(link, attempt + 1);
+    return convertVivdiskLink(link, attempt + 1, maniChannelName);
   } else if (resData.includes("data null")) {
     return {
       link: "",
@@ -176,8 +191,8 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       const {
         link: newLink,
         attempt
-      } = await convertVivdiskLink(link, 1);
-      console.log("attempt", attempt, "mdisk data", newLink);
+      } = await convertVivdiskLink(link, 1, maniChannelName);
+      console.log("attempt", attempt, "vivdisk data", newLink);
       return newLink;
     } else {
       return "";
@@ -222,8 +237,6 @@ const duplicateFinder = async link => {
       params.linkType = "dood";
     } else if (link.toLowerCase().includes("vivdisk")) {
       params.linkType = "vivdisk";
-    } else if (link.toLowerCase().includes("terabox")) {
-      params.linkType = "terabox";
     }
     let u_url = link;
     if (mongoApiUrl) {
