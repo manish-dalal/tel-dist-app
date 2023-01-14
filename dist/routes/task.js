@@ -137,7 +137,7 @@ router.post("/start", async (req, res) => {
             messages
           } = messageResponse.data;
           console.log("category=", category, "messages", messages.length, "totalpages", totalpages);
-          const expectedNextPage = parsePage + parsepageIncrementor * index;
+          const expectedNextPage = parsePage + parsepageIncrementor * (index + 1);
           nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
           params.page = nextPage;
           fetchMessages.push(...messages);
