@@ -287,7 +287,7 @@ const getConvertedLink = async (urls, mode) => {
           converted_link = !i.includes("mdisk") ? await duplicateFinder(i) : "";
           break;
         case iMode.CHANNEL_REMOVER_KEEP_TERABOX:
-          converted_link = i.includes("terabox") ? i : "";
+          converted_link = i.includes("terabox") || i.includes("nephobox") ? i : "";
           break;
       }
       urls_dict[i] = converted_link;
