@@ -2,8 +2,8 @@
 
 var Xray = require("x-ray");
 var x = Xray();
-x("https://vivdisk.com/convertor/play/WiQQce", ".video-durations@html")(function (err, ...rest) {
-  console.log(rest); // Google
+x("https://vivdisk.com/convertor/play/WiQQce", ".video-durations@html")(function (err, title) {
+  console.log(`==${title.trim()}==`); // Google
 });
 
 x("https://vivdisk.com/convertor/play/WiQQce", ".disk-details", ["span@html"])(function (err, ...rest) {

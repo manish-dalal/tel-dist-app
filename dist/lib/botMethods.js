@@ -145,8 +145,8 @@ const getVivdiskTitle = url => {
   return new Promise((resolve, reject) => {
     xClient(url, ".video-durations@html")(function (err, title) {
       if (err) reject(err);
-      console.log(title);
-      return resolve(title);
+      console.log(title.trim());
+      return resolve(title.trim());
     });
   });
 };
