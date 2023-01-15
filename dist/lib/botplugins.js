@@ -468,12 +468,14 @@ const processMessages = async bot => {
               thumbUrl = "",
               imgDriveId = "",
               maniChannelName = config.CHANNEL,
+              backupChannelLink: backLink,
               isNewMdisk = false,
               isEuOrgLink = true,
               cloudinaryUrl,
               ignoreRemoveChannelName = false,
               useCustomMessage = false
             } = msg;
+            const backupChannelLink = backLink || config.BACKUP_CHANNEL_LINK;
             let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, true);
             const clStrTemp = isNewMdisk ? await multiLinkCon({
               mlStr: clStr,
@@ -494,23 +496,16 @@ const processMessages = async bot => {
             const opts = {
               caption: clStr.slice(0, 1025)
             };
-            let channelButtons = [{
-              text: additionalAction ? "🙏 Join Backup Channel 🙏" : "🔞👉 All Channel Link 👈⬇️",
-              url: `https://t.me/${maniChannelName}`
-            }];
             const {
-              BACKUP_CHANNEL_LINK = "",
               ALL_CHANNEL_LINK = ""
             } = config;
-            if (BACKUP_CHANNEL_LINK && ALL_CHANNEL_LINK) {
-              channelButtons = [{
-                text: "🙏 Backup Channel",
-                url: BACKUP_CHANNEL_LINK
-              }, {
-                text: "🔞👉 All Channel Link",
-                url: ALL_CHANNEL_LINK
-              }];
-            }
+            const channelButtons = [{
+              text: "🙏 Backup Channel",
+              url: backupChannelLink || `https://t.me/${maniChannelName}`
+            }, {
+              text: "🔞👉 All Channel Link",
+              url: ALL_CHANNEL_LINK || `https://t.me/${maniChannelName}`
+            }];
             opts["reply_markup"] = {
               inline_keyboard: [channelButtons]
             };

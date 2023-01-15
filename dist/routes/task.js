@@ -100,6 +100,7 @@ router.post("/start", async (req, res) => {
         cname = "v1",
         linkType = "mdisk",
         channelName,
+        backupChannelLink = "",
         thumbUrl,
         groupInfo,
         _id,
@@ -155,6 +156,7 @@ router.post("/start", async (req, res) => {
             targetChatId: groupInfo.id,
             ...thumbUrlObj,
             maniChannelName: channelName,
+            backupChannelLink,
             isEuOrgLink,
             isNewMdisk,
             useCustomMessage
