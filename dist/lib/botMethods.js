@@ -1,6 +1,9 @@
 "use strict";
 
 const telegram = require("node-telegram-bot-api");
+const get = require("lodash/get");
+const set = require("lodash/set");
+const orderBy = require("lodash/orderBy");
 const config = require("../config");
 const Xray = require("x-ray");
 const xClient = Xray();
@@ -10,13 +13,31 @@ const getDateString = () => {
   const dateStr = `(${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)})`;
   return timestr + dateStr;
 };
-const token = config.TELEGRAM_TOKEN_1;
+const token1 = config.TELEGRAM_TOKEN_1;
+const token2 = config.TELEGRAM_TOKEN_2;
+const token3 = config.TELEGRAM_TOKEN_3;
+const token4 = config.TELEGRAM_TOKEN_4;
+const token5 = config.TELEGRAM_TOKEN_5;
 let bot1 = null;
-if (token && !bot1) {
-  bot1 = new telegram(token, {});
+let bot2 = null;
+let bot3 = null;
+let bot4 = null;
+let bot5 = null;
+if (token1 && !bot1) {
+  bot1 = new telegram(token1, {});
 }
-let lastTelgramSendRequest = new Date();
-let lastTelgramSendRequest1 = new Date();
+if (token2 && !bot2) {
+  bot2 = new telegram(token2, {});
+}
+if (token3 && !bot3) {
+  bot3 = new telegram(token3, {});
+}
+if (token4 && !bot4) {
+  bot4 = new telegram(token4, {});
+}
+if (token5 && !bot5) {
+  bot5 = new telegram(token5, {});
+}
 let telegramBot = null;
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -32,50 +53,114 @@ const declineChatJoinRequest = async (chatId, userId, options) => {
   const res = await telegramBot.declineChatJoinRequest(chatId, userId, options);
   return res;
 };
-const validChatArr = {
-  approved: [],
-  pending: [],
-  deny: []
+const botList = [{
+  botId: 1,
+  bot: telegramBot,
+  lastTelgramSendRequest: new Date().getTime()
+}, bot1 && {
+  botId: 2,
+  bot: bot1,
+  lastTelgramSendRequest: new Date().getTime()
+}, bot2 && {
+  botId: 3,
+  bot: bot2,
+  lastTelgramSendRequest: new Date().getTime()
+}, bot3 && {
+  botId: 4,
+  bot: bot3,
+  lastTelgramSendRequest: new Date().getTime()
+}, bot4 && {
+  botId: 5,
+  bot: bot4,
+  lastTelgramSendRequest: new Date().getTime()
+}, bot5 && {
+  botId: 6,
+  bot: bot5,
+  lastTelgramSendRequest: new Date().getTime()
+}];
+const getBotList = () => {
+  botList[0].bot = telegramBot;
+  const sortedBotList = orderBy(botList.filter(el => !!el), "lastTelgramSendRequest");
+  return sortedBotList;
+};
+const chatBotStatus = {
+  1: {
+    approved: [],
+    pending: [],
+    deny: []
+  }
 };
 const isBotAddedInChat = async (chatId, botInstance) => {
-  if (validChatArr.approved.includes(chatId)) {
-    return true;
-  } else if (validChatArr.deny.includes(chatId)) {
-    return false;
+  let status;
+  let errorObj = {};
+  if (get(chatBotStatus, `${chatId}.approved`, []).includes(botInstance.botId)) {
+    status = true;
+  } else if (get(chatBotStatus, `${chatId}.deny`, []).includes(botInstance.botId)) {
+    status = false;
   } else {
     try {
-      console.log("validChatArr", JSON.stringify(validChatArr), chatId);
-      const respq = await botInstance.getChatAdministrators(chatId);
-      validChatArr.approved.push(chatId);
-      return true;
+      // console.log("validChatArr", JSON.stringify(chatBotStatus), chatId);
+      const respq = await botInstance.bot.getChatAdministrators(chatId);
+      const appChats = get(chatBotStatus, `${chatId}.approved`, []);
+      set(chatBotStatus, `${chatId}.approved`, [...appChats, botInstance.botId]);
+      status = true;
     } catch (error) {
-      validChatArr.pending.push(chatId);
-      if (validChatArr.pending.includes(chatId)) {
-        validChatArr.deny.push(chatId);
+      const pendingChats = get(chatBotStatus, `${chatId}.pending`, []);
+      set(chatBotStatus, `${chatId}.pending`, [...pendingChats, botInstance.botId]);
+      if (pendingChats.includes(chatId)) {
+        const denyChats = get(chatBotStatus, `${chatId}.deny`, []);
+        set(chatBotStatus, `${chatId}.deny`, [...denyChats, botInstance.botId]);
       }
-      return false;
+      status = false;
+      errorObj = {
+        name: get(error, "response.body.error_code", ""),
+        message: get(error, "response.body.description", "")
+      };
     }
   }
+  return {
+    status,
+    errorObj
+  };
 };
 const getBotInstanseAndSleep = async ({
   bot,
   chatId
 }) => {
-  const remaingTime = Math.max(7000 - (new Date().getTime() - lastTelgramSendRequest.getTime()), 0);
-  const remaingTime1 = Math.max(7000 - (new Date().getTime() - lastTelgramSendRequest1.getTime()), 0);
-  if (remaingTime > remaingTime1 && bot1) {
-    console.log("remaingTime1", remaingTime1);
-    await sleep(Math.max(remaingTime1, 0));
-    const isBotAdmin = await isBotAddedInChat(chatId, bot1);
+  const sortedBotList = getBotList();
+
+  // console.log("JSON.stringify(chatBotStatus)", JSON.stringify(chatBotStatus));
+  // console.log(
+  //   "sortedBotList",
+  //   JSON.stringify(sortedBotList.map(e => ({ botId: e.botId, lastTelgramSendRequest: e.lastTelgramSendRequest })))
+  // );
+  let finalBot = null;
+  let error = {};
+  for (let i = 0; i <= sortedBotList.length; i++) {
+    const el = sortedBotList[i];
+    const {
+      status: isBotAdmin,
+      errorObj
+    } = await isBotAddedInChat(chatId, el);
+    console.log(el.botId, "satus", isBotAdmin);
     if (isBotAdmin) {
-      lastTelgramSendRequest1 = new Date();
-      return bot1;
+      const remaingTime = Math.max(6000 - (new Date().getTime() - el.lastTelgramSendRequest), 0);
+      await sleep(Math.max(remaingTime, 0));
+      el.lastTelgramSendRequest = new Date().getTime();
+      finalBot = el.bot;
+      break;
+    } else {
+      if (el.botId === 1) {
+        finalBot = el.bot;
+        error = errorObj;
+        break;
+      }
     }
   }
-  console.log("remaingTime", remaingTime);
-  await sleep(Math.max(remaingTime, 0));
-  lastTelgramSendRequest = new Date();
-  return bot;
+  return {
+    bot: finalBot || telegramBot,
+    error
+  };
 };
 const getFileData = (msg, activeLinkType, cname = "") => {
   let mimeType = "";

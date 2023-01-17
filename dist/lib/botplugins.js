@@ -509,21 +509,27 @@ const processMessages = async bot => {
             opts["reply_markup"] = {
               inline_keyboard: [channelButtons]
             };
-            const botFinal = await getBotInstanseAndSleep({
+            const {
+              bot: botFinal,
+              error
+            } = await getBotInstanseAndSleep({
               bot,
               chatId: targetChatId
             });
+            if (error !== null && error !== void 0 && error.message) {
+              throw error;
+            }
             if (thumbUrl || imgDriveId || cloudinaryUrl) {
               // const tempUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
               const tempUrl = `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
               imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${(Math.random() * 100).toFixed()}` : tempUrl);
               console.log("imageUrl##", imageUrl);
               if (opts.caption) {
-                const sendData = await botFinal.sendPhoto(targetChatId, imageUrl, opts);
+                const sendData = !(error !== null && error !== void 0 && error.message) && (await botFinal.sendPhoto(targetChatId, imageUrl, opts));
+                // console.log("sendData###", sendData);
               }
-              // console.log("sendData###", sendData);
             } else {
-              await botFinal.sendMessage(targetChatId, clStr);
+              !(error !== null && error !== void 0 && error.message) && (await botFinal.sendMessage(targetChatId, clStr));
             }
             additionalAction && additionalAction();
           } catch (errorDb) {
