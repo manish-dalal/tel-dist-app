@@ -144,7 +144,7 @@ const getBotInstanseAndSleep = async ({
     } = await isBotAddedInChat(chatId, el);
     console.log(el.botId, "satus", isBotAdmin);
     if (isBotAdmin) {
-      const remaingTime = Math.max(6000 - (new Date().getTime() - el.lastTelgramSendRequest), 0);
+      const remaingTime = Math.max(3000 - (new Date().getTime() - el.lastTelgramSendRequest), 0);
       await sleep(Math.max(remaingTime, 0));
       el.lastTelgramSendRequest = new Date().getTime();
       finalBot = el.bot;
