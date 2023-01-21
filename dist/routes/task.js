@@ -155,6 +155,7 @@ router.post("/start", async (req, res) => {
             ...element,
             targetChatId: groupInfo.id,
             ...thumbUrlObj,
+            linkType,
             maniChannelName: channelName,
             backupChannelLink,
             isEuOrgLink,

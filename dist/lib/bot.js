@@ -79,14 +79,14 @@ Happy torrenting :)
 `;
 const newStartText = msg => `**𝗛𝗘𝗟𝗟𝗢🎈${msg.chat.first_name}!** \n
 𝐈'𝐦 𝐚 Doodstream/mdisk 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭... \n𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
+const isMainBot = config.CNAME == "v1" || config.CNAME == "man";
 const helpText = `You can control me by sending these commands:
 /setmode - Update active mode
 /getmode - get active mode 
-/setcategory - Update active category
+${isMainBot ? `/setcategory - Update active category
 /getcategory - get active category
-/setlinktype - main site used
+/setlinktype - main site used` : ""}
 /getprocessstats - process stats
-/sleep - Bot sleep in heroku time
 /help - Get help info \n
         "𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
 function bot(torrent, bot) {
@@ -197,39 +197,61 @@ function bot(torrent, bot) {
   });
   bot.onText(setmodeRegex, async (msg, match) => {
     checkUser(() => {
+      const inlineKeyboard = isMainBot ? [[{
+        text: "Add Thumb Image",
+        callback_data: iMode.THUMB
+      }, {
+        text: "Channel Name Updater",
+        callback_data: iMode.CHANNELREMOVER
+      }], [{
+        text: "co.in link",
+        callback_data: iMode.COIN
+      }, {
+        text: "Mdisk/Dood link",
+        callback_data: iMode.MDISK
+      }], [{
+        text: "Duplicate Link Remover",
+        callback_data: iMode.DUPLICATE
+      }, {
+        text: "Mdisk/Dood + Duplicate",
+        callback_data: iMode.MDISKDUPLICATE
+      }], [{
+        text: "Message in DB",
+        callback_data: iMode.SAVEDB
+      }, {
+        text: "Get Message info",
+        callback_data: iMode.MESSAGEINFO
+      }], [{
+        text: "D+M Link remover",
+        callback_data: iMode.DUPLICATE_REMOVE_MDISK
+      }, {
+        text: "C Remove Keep terabox",
+        callback_data: iMode.CHANNEL_REMOVER_KEEP_TERABOX
+      }], [{
+        text: "Thumb + Keep terabox",
+        callback_data: iMode.THUMB_KEEP_TERABOX
+      }]] : [[{
+        text: "Add Thumb Image",
+        callback_data: iMode.THUMB
+      }, {
+        text: "Channel Name Updater",
+        callback_data: iMode.CHANNELREMOVER
+      }], [{
+        text: "co.in link",
+        callback_data: iMode.COIN
+      }, {
+        text: "Mdisk/Dood link",
+        callback_data: iMode.MDISK
+      }], [{
+        text: "C Remove Keep terabox",
+        callback_data: iMode.CHANNEL_REMOVER_KEEP_TERABOX
+      }, {
+        text: "Thumb + Keep terabox",
+        callback_data: iMode.THUMB_KEEP_TERABOX
+      }]];
       const from = msg.chat.id;
       var keyboard = {
-        inline_keyboard: [[{
-          text: "Add Thumb Image",
-          callback_data: iMode.THUMB
-        }, {
-          text: "Channel Name Updater",
-          callback_data: iMode.CHANNELREMOVER
-        }], [{
-          text: "co.in link",
-          callback_data: iMode.COIN
-        }, {
-          text: "Mdisk/Dood link",
-          callback_data: iMode.MDISK
-        }], [{
-          text: "Duplicate Link Remover",
-          callback_data: iMode.DUPLICATE
-        }, {
-          text: "Mdisk/Dood + Duplicate",
-          callback_data: iMode.MDISKDUPLICATE
-        }], [{
-          text: "Message in DB",
-          callback_data: iMode.SAVEDB
-        }, {
-          text: "Get Message info",
-          callback_data: iMode.MESSAGEINFO
-        }], [{
-          text: "D+M Link remover",
-          callback_data: iMode.DUPLICATE_REMOVE_MDISK
-        }, {
-          text: "C Remove Keep terabox",
-          callback_data: iMode.CHANNEL_REMOVER_KEEP_TERABOX
-        }]]
+        inline_keyboard: inlineKeyboard
       };
       const opts = {
         reply_markup: JSON.stringify(keyboard)

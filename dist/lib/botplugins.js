@@ -39,7 +39,8 @@ const iMode = {
   DBMESSAGESENDER: 121,
   MESSAGEINFO: 8,
   DUPLICATE_REMOVE_MDISK: 9,
-  CHANNEL_REMOVER_KEEP_TERABOX: 10
+  CHANNEL_REMOVER_KEEP_TERABOX: 10,
+  THUMB_KEEP_TERABOX: 11
 };
 const replaceTextArr = JSON.parse(config.REPLACE_TEXTS);
 const replaceWords = replaceTextArr.filter(el => !el.includes(" "));
@@ -453,6 +454,19 @@ const processMessages = async bot => {
               chatId
             });
           }
+        } else if (mode === iMode.THUMB_KEEP_TERABOX) {
+          const convertedArr = await multiLinkCon({
+            mlStr: msg.caption || msg.text,
+            mode: iMode.CHANNEL_REMOVER_KEEP_TERABOX,
+            isSplit: true
+          });
+          for (const ind of convertedArr) {
+            await sleep(0.2);
+            const opts = {
+              caption: ind
+            };
+            await bot.sendPhoto(chatId, config.THUMB_FILE_ID, opts);
+          }
         } else if (mode === iMode.THUMB) {
           const clStr = removeUsername(msg.caption || msg.text);
           const opts = {
@@ -465,6 +479,7 @@ const processMessages = async bot => {
             const {
               targetChatId,
               additionalAction,
+              linkType = "mdisk",
               thumbUrl = "",
               imgDriveId = "",
               maniChannelName = config.CHANNEL,
