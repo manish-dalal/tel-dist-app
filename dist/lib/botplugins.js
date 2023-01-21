@@ -23,7 +23,8 @@ const {
   getFileData,
   sleep,
   convertMessageBody,
-  getVivdiskTitle
+  getVivdiskTitle,
+  addFooterToAutoMesage
 } = require("./botMethods");
 let dataArray = [];
 let isMessageProcessing = false;
@@ -508,6 +509,10 @@ const processMessages = async bot => {
               maniChannelName,
               useCustomMessage: true
             }) : clStr;
+            clStr = addFooterToAutoMesage({
+              msg: clStr,
+              linkType
+            });
             const opts = {
               caption: clStr.slice(0, 1025)
             };

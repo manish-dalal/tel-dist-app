@@ -226,10 +226,17 @@ const convertMessageBody = links => {
   str = `${str}\n${footer}`;
   return str;
 };
-const addFooterToAutoMesage = linktype => {
-  const footer = config.AUTO_SEND_MESSAGE_FOOTER || `\n✎ᴺᵒᵗᵉ ⁻ ᴵⁿˢᵗᵃˡˡ __APPNAME__ ᵀᵒ ᵂᵃᵗᶜʰ ᴼⁿˡⁱⁿᵉ`;
-  let str = footer.replace(/__APPNAME__/g, "Terabox");
-  return str;
+const addFooterToAutoMesage = ({
+  msg,
+  linkType
+}) => {
+  const footer = config.AUTO_SEND_MESSAGE_FOOTER || `\n\n✎ᴺᵒᵗᵉ ⁻ ᴵⁿˢᵗᵃˡˡ __APPNAME__ ᵀᵒ ᵂᵃᵗᶜʰ ᴼⁿˡⁱⁿᵉ`;
+  const playerMap = {
+    terabox: "Terabox",
+    vivdisk: "VDX Player"
+  };
+  let str = playerMap[linkType] ? footer.replace(/__APPNAME__/g, playerMap[linkType]) : "";
+  return `${msg}${str}`;
 };
 const getVivdiskTitle = url => {
   return new Promise((resolve, reject) => {
@@ -249,5 +256,6 @@ module.exports = {
   getFileData,
   sendMessage,
   getVivdiskTitle,
+  addFooterToAutoMesage,
   convertMessageBody
 };
