@@ -320,7 +320,7 @@ const multiLinkCon = async ({
     const noOfSavedMessages = Math.ceil(newUrls.length / spliterNum);
     [...Array(noOfSavedMessages)].forEach((e, conut) => {
       const splitArr = newUrls.slice(conut * spliterNum, (conut + 1) * spliterNum);
-      const finalStr = convertMessageBody(splitArr);
+      const finalStr = convertMessageBody(splitArr, config.KEEP_CAPTION_TITLE ? mlStr : "");
       finalArr.push(finalStr);
     });
     return finalArr;

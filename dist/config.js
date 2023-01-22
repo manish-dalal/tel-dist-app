@@ -49,6 +49,7 @@ const config = {
   BACKUP_CHANNEL_LINK: process.env.BACKUP_CHANNEL_LINK,
   ALL_CHANNEL_LINK: process.env.ALL_CHANNEL_LINK,
   MESSAGE_HEADER: process.env.MESSAGE_HEADER,
-  MESSAGE_FOOTER: process.env.MESSAGE_FOOTER
+  MESSAGE_FOOTER: process.env.MESSAGE_FOOTER,
+  KEEP_CAPTION_TITLE: process.env.KEEP_CAPTION_TITLE
 };
 module.exports = config;
