@@ -219,7 +219,7 @@ const sendMessage = async ({
 const convertMessageBody = (links, mlStr = "") => {
   const header = config.MESSAGE_HEADER || "📥 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐋𝐢𝐧𝐤𝐬/👀𝐖𝐚𝐭𝐜𝐡 𝐎𝐧𝐥𝐢𝐧𝐞\n\n";
   const footer = config.MESSAGE_FOOTER || `\n⬤▬▬▬▬▬▬▬▬▬▬▬▬▬⬤\n`;
-  let str = mlStr ? mlStr.substring(0, mlStr.indexOf(links[0])) : header;
+  let str = mlStr ? mlStr.substring(0, mlStr.indexOf(links[0])).replace("Video 1. 👉 ", "") : header;
   links.forEach((el, index) => {
     str = `${str}Video ${index + 1}. 👉 ${el} \n\n`;
   });
