@@ -142,7 +142,7 @@ const getBotInstanseAndSleep = async ({
       status: isBotAdmin,
       errorObj
     } = await isBotAddedInChat(chatId, el);
-    console.log(el.botId, "satus", isBotAdmin);
+    // console.log(el.botId, "satus", isBotAdmin);
     if (isBotAdmin) {
       const remaingTime = Math.max(3000 - (new Date().getTime() - el.lastTelgramSendRequest), 0);
       await sleep(Math.max(remaingTime, 0));
@@ -219,7 +219,8 @@ const sendMessage = async ({
 const convertMessageBody = (links, mlStr = "") => {
   const header = config.MESSAGE_HEADER || "📥 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐋𝐢𝐧𝐤𝐬/👀𝐖𝐚𝐭𝐜𝐡 𝐎𝐧𝐥𝐢𝐧𝐞\n\n";
   const footer = config.MESSAGE_FOOTER || `\n⬤▬▬▬▬▬▬▬▬▬▬▬▬▬⬤\n`;
-  let str = mlStr ? mlStr.substring(0, mlStr.indexOf(links[0])).replace("Video 1. 👉 ", "") : header;
+  const subHeader = mlStr && mlStr.substring(0, mlStr.indexOf(links[0])).replaceAll("Video 1. 👉 ", "");
+  let str = subHeader && !subHeader.toLowerCase().includes("today") ? subHeader : header;
   links.forEach((el, index) => {
     str = `${str}Video ${index + 1}. 👉 ${el} \n\n`;
   });
