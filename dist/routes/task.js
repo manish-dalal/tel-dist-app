@@ -13,6 +13,115 @@ const {
 } = require("../utils/winston");
 const getChatMembersCount = require("../utils/getChatMembersCount");
 const serverUrl = config.SERVER_SITE;
+let startQueue = [];
+let isQueueRunning = false;
+setInterval(async () => {
+  if (!isQueueRunning && startQueue.length) {
+    try {
+      const tempstartQueue = [...startQueue];
+      startQueue = [];
+      isQueueRunning = true;
+      for (const task of tempstartQueue) {
+        const {
+          categoryState = [],
+          cname = "v1",
+          linkType = "mdisk",
+          channelName,
+          backupChannelLink = "",
+          thumbUrl,
+          groupInfo,
+          _id,
+          isEuOrgLink = true,
+          isNewMdisk,
+          useCustomMessage,
+          numberOfTimes = 1
+        } = task;
+        const newCategoryState = [];
+        for (let cat of categoryState) {
+          const {
+            size = 40,
+            page = 0,
+            category = "",
+            pageIncrementor = 1,
+            isRealImage = false
+          } = cat;
+          let params = {
+            category,
+            cname,
+            linkType,
+            pageSize: size,
+            page
+          };
+          const fetchMessages = [];
+          let nextPage = 0;
+          for (const [index, v] of Array(numberOfTimes).entries()) {
+            const parsepageIncrementor = parseInt(pageIncrementor);
+            const parsePage = parseInt(params.page);
+            const url = new URL(`${serverUrl}/message/list`);
+            url.search = new URLSearchParams(params);
+            const messageResponse = await axios.get(url.href);
+            const {
+              totalpages,
+              messages
+            } = messageResponse.data;
+            console.log("category=", category, "messages", messages.length, "totalpages", totalpages);
+            const expectedNextPage = parsePage + parsepageIncrementor * (index + 1);
+            nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
+            params.page = nextPage;
+            fetchMessages.push(...messages);
+          }
+          newCategoryState.push({
+            ...cat,
+            page: nextPage
+          });
+          fetchMessages.forEach(element => {
+            const thumbUrlObj = isRealImage ? {} : {
+              thumbUrl
+            };
+            const msg = {
+              ...element,
+              targetChatId: groupInfo.id,
+              ...thumbUrlObj,
+              linkType,
+              maniChannelName: channelName,
+              backupChannelLink,
+              isEuOrgLink,
+              isNewMdisk,
+              useCustomMessage
+            };
+            if (categoryState[categoryState.length - 1] === cat && fetchMessages[fetchMessages.length - 1] === element) {
+              msg["additionalAction"] = async (errorMess = "") => {
+                const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, {
+                  status: errorMess || "active"
+                });
+                console.log("taskUpdateRes End", taskUpdateRes.data);
+              };
+            }
+            pushInMessageQueue({
+              msg,
+              mode: iMode.DBMESSAGESENDER
+            });
+          });
+        }
+        const membersCount = await getChatMembersCount(config.TELEGRAM_TOKEN, groupInfo.id);
+        const membersCountObj = membersCount ? {
+          membersCount
+        } : {};
+        let taskUpdatedData = {
+          status: "processing",
+          lastExecuted: new Date(),
+          ...membersCountObj,
+          categoryState: newCategoryState
+        };
+        const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, taskUpdatedData);
+        console.log("taskRes start", taskUpdateRes.data);
+      }
+    } catch (error) {
+      isQueueRunning = false;
+    }
+    isQueueRunning = false;
+  }
+}, 30000);
 const router = express.Router();
 router.post("/add", async (req, res) => {
   const body = req.body;
@@ -95,99 +204,7 @@ router.get("/list", async (req, res) => {
 router.post("/start", async (req, res) => {
   try {
     for (const task of req.body) {
-      const {
-        categoryState = [],
-        cname = "v1",
-        linkType = "mdisk",
-        channelName,
-        backupChannelLink = "",
-        thumbUrl,
-        groupInfo,
-        _id,
-        isEuOrgLink = true,
-        isNewMdisk,
-        useCustomMessage,
-        numberOfTimes = 1
-      } = task;
-      const newCategoryState = [];
-      for (let cat of categoryState) {
-        const {
-          size = 40,
-          page = 0,
-          category = "",
-          pageIncrementor = 1,
-          isRealImage = false
-        } = cat;
-        let params = {
-          category,
-          cname,
-          linkType,
-          pageSize: size,
-          page
-        };
-        const fetchMessages = [];
-        let nextPage = 0;
-        for (const [index, v] of Array(numberOfTimes).entries()) {
-          const parsepageIncrementor = parseInt(pageIncrementor);
-          const parsePage = parseInt(params.page);
-          const url = new URL(`${serverUrl}/message/list`);
-          url.search = new URLSearchParams(params);
-          const messageResponse = await axios.get(url.href);
-          const {
-            totalpages,
-            messages
-          } = messageResponse.data;
-          console.log("category=", category, "messages", messages.length, "totalpages", totalpages);
-          const expectedNextPage = parsePage + parsepageIncrementor * (index + 1);
-          nextPage = totalpages <= expectedNextPage ? parsePage % 2 : expectedNextPage;
-          params.page = nextPage;
-          fetchMessages.push(...messages);
-        }
-        newCategoryState.push({
-          ...cat,
-          page: nextPage
-        });
-        fetchMessages.forEach(element => {
-          const thumbUrlObj = isRealImage ? {} : {
-            thumbUrl
-          };
-          const msg = {
-            ...element,
-            targetChatId: groupInfo.id,
-            ...thumbUrlObj,
-            linkType,
-            maniChannelName: channelName,
-            backupChannelLink,
-            isEuOrgLink,
-            isNewMdisk,
-            useCustomMessage
-          };
-          if (categoryState[categoryState.length - 1] === cat && fetchMessages[fetchMessages.length - 1] === element) {
-            msg["additionalAction"] = async (errorMess = "") => {
-              const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, {
-                status: errorMess || "active"
-              });
-              console.log("taskUpdateRes End", taskUpdateRes.data);
-            };
-          }
-          pushInMessageQueue({
-            msg,
-            mode: iMode.DBMESSAGESENDER
-          });
-        });
-      }
-      const membersCount = await getChatMembersCount(config.TELEGRAM_TOKEN, groupInfo.id);
-      const membersCountObj = membersCount ? {
-        membersCount
-      } : {};
-      let taskUpdatedData = {
-        status: "processing",
-        lastExecuted: new Date(),
-        ...membersCountObj,
-        categoryState: newCategoryState
-      };
-      const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, taskUpdatedData);
-      console.log("taskRes start", taskUpdateRes.data);
+      startQueue.push(task);
     }
     console.log("Send add response");
     res.json({
