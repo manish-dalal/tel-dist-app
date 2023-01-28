@@ -248,6 +248,13 @@ const getVivdiskTitle = url => {
     });
   });
 };
+const getMessageWithBoldLink = clStr => {
+  var urlRegex = /(https?:\/\/[^\s]+)/g;
+  const urls = clStr.match(urlRegex);
+  return urls.reduce((acStr, element, index) => {
+    return acStr.replaceAll(urls[index], `<b>${urls[index]}</b>`);
+  }, clStr);
+};
 module.exports = {
   setBot,
   approveChatJoinRequest,
@@ -258,5 +265,6 @@ module.exports = {
   sendMessage,
   getVivdiskTitle,
   addFooterToAutoMesage,
-  convertMessageBody
+  convertMessageBody,
+  getMessageWithBoldLink
 };

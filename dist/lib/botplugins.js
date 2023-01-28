@@ -24,7 +24,8 @@ const {
   sleep,
   convertMessageBody,
   getVivdiskTitle,
-  addFooterToAutoMesage
+  addFooterToAutoMesage,
+  getMessageWithBoldLink
 } = require("./botMethods");
 let dataArray = [];
 let isMessageProcessing = false;
@@ -509,12 +510,14 @@ const processMessages = async bot => {
               maniChannelName,
               useCustomMessage: true
             }) : clStr;
+            clStr = getMessageWithBoldLink(clStr);
             clStr = addFooterToAutoMesage({
               msg: clStr,
               linkType
             });
             const opts = {
-              caption: clStr.slice(0, 1025)
+              caption: clStr.slice(0, 1025),
+              parse_mode: "HTML"
             };
             const {
               ALL_CHANNEL_LINK = ""

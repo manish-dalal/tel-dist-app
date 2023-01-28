@@ -435,6 +435,7 @@ function bot(torrent, bot) {
       text,
       caption
     } = msg;
+    // console.log("msg@@@", JSON.stringify(msg));
     Logger.info("message" + JSON.stringify({
       from,
       text,
