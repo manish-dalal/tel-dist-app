@@ -25,7 +25,7 @@ const {
   convertMessageBody,
   getVivdiskTitle,
   addFooterToAutoMesage,
-  getMessageWithBoldLink
+  getMessageBoldEntities
 } = require("./botMethods");
 let dataArray = [];
 let isMessageProcessing = false;
@@ -510,14 +510,14 @@ const processMessages = async bot => {
               maniChannelName,
               useCustomMessage: true
             }) : clStr;
-            clStr = getMessageWithBoldLink(clStr);
+            const boldEntities = getMessageBoldEntities(clStr);
             clStr = addFooterToAutoMesage({
               msg: clStr,
               linkType
             });
             const opts = {
               caption: clStr.slice(0, 1025),
-              parse_mode: "HTML"
+              caption_entities: JSON.stringify(boldEntities)
             };
             const {
               ALL_CHANNEL_LINK = ""
@@ -552,7 +552,9 @@ const processMessages = async bot => {
                 // console.log("sendData###", sendData);
               }
             } else {
-              !(error !== null && error !== void 0 && error.message) && (await botFinal.sendMessage(targetChatId, clStr));
+              !(error !== null && error !== void 0 && error.message) && (await botFinal.sendMessage(targetChatId, clStr, {
+                entities: JSON.stringify(boldEntities)
+              }));
             }
             additionalAction && additionalAction();
           } catch (errorDb) {

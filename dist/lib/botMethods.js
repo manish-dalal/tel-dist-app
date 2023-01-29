@@ -3,6 +3,7 @@
 const telegram = require("node-telegram-bot-api");
 const get = require("lodash/get");
 const set = require("lodash/set");
+const uniqBy = require("lodash/uniqBy");
 const orderBy = require("lodash/orderBy");
 const config = require("../config");
 const Xray = require("x-ray");
@@ -248,12 +249,27 @@ const getVivdiskTitle = url => {
     });
   });
 };
-const getMessageWithBoldLink = clStr => {
+const indexOfAll = (array, searchItem) => {
+  let i = array.indexOf(searchItem),
+    indexes = [];
+  while (i !== -1) {
+    indexes.push(i);
+    i = array.indexOf(searchItem, ++i);
+  }
+  return indexes;
+};
+const getMessageBoldEntities = clStr => {
   var urlRegex = /(https?:\/\/[^\s]+)/g;
   const urls = clStr.match(urlRegex);
-  return urls.reduce((acStr, element, index) => {
-    return acStr.replaceAll(urls[index], `<b>${urls[index]}</b>`);
-  }, clStr);
+  return urls.reduce((acArr, element, index) => {
+    let aUrl = urls[index];
+    const allIndex = indexOfAll(clStr, aUrl);
+    return uniqBy([...acArr, ...allIndex.map(e => ({
+      offset: e,
+      length: aUrl.length,
+      type: "bold"
+    }))], "offset");
+  }, []);
 };
 module.exports = {
   setBot,
@@ -266,5 +282,6 @@ module.exports = {
   getVivdiskTitle,
   addFooterToAutoMesage,
   convertMessageBody,
-  getMessageWithBoldLink
+  indexOfAll,
+  getMessageBoldEntities
 };
