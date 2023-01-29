@@ -22,6 +22,7 @@ const search = require("./routes/search");
 const details = require("./routes/details");
 const torrent = require("./routes/torrent");
 const task = require("./routes/task");
+const category = require("./routes/category");
 const joinRequests = require("./routes/joinRequests");
 const {
   Logger: logger
@@ -106,6 +107,7 @@ server.use("/api/v1/torrent", torrent);
 server.use("/api/v1/search", search);
 server.use("/api/v1/details", details);
 server.use("/api/v1/task", task);
+server.use("/api/v1/category", category);
 server.use("/api/v1/chatjoin", joinRequests);
 server.get("/api/v1/uptime", async (req, res) => {
   res.send({

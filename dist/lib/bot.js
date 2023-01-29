@@ -15,6 +15,9 @@ const config = require("../config");
 const {
   Logger
 } = require("../utils/winston");
+const {
+  categories
+} = require("../utils/categories");
 const api = config.SEARCH_SITE || "https://torrent-aio-bot.herokuapp.com/";
 console.log("Using api: ", api);
 let activeMode = parseInt(config.DEFAULT_MODE) || 6;
@@ -36,6 +39,7 @@ const setmodeRegex = /(\/setmode|\/setmode (.+))/;
 const getcategoryRegex = /\/getcategory/;
 const setcategoryRegex = /(\/setcategory|\/setcategory (.+))/;
 const setlinktypeRegex = /(\/setlinktype|\/setlinktype (.+))/;
+const getlinktypeRegex = /\/getlinktype/;
 const startMessage = `
 Welcome, here are some commands to get you started:
 
@@ -79,13 +83,14 @@ Happy torrenting :)
 `;
 const newStartText = msg => `**𝗛𝗘𝗟𝗟𝗢🎈${msg.chat.first_name}!** \n
 𝐈'𝐦 𝐚 Doodstream/mdisk 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭... \n𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
-const isMainBot = config.CNAME == "v1" || config.CNAME == "man";
+const isMainBot = JSON.parse(get(config, "ISFULLBOT", "false"));
 const helpText = `You can control me by sending these commands:
 /setmode - Update active mode
 /getmode - get active mode 
 ${isMainBot ? `/setcategory - Update active category
 /getcategory - get active category
-/setlinktype - main site used` : ""}
+/setlinktype - set linktype
+/getlinktype - get linktype` : ""}
 /getprocessstats - process stats
 /help - Get help info \n
         "𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @${config.CHANNEL} 💖`;
@@ -132,6 +137,14 @@ function bot(torrent, bot) {
       bot.sendMessage(from, `Active category = ${activeCategory}`);
     }, msg);
   });
+  bot.onText(getlinktypeRegex, async (msg, match) => {
+    checkUser(() => {
+      console.log("getlinktypeRegex msg", JSON.stringify(msg));
+      console.log("match", JSON.stringify(match));
+      const from = msg.chat.id;
+      bot.sendMessage(from, `Active linktype = ${activeLinkType}`);
+    }, msg);
+  });
   bot.onText(setlinktypeRegex, async (msg, match) => {
     checkUser(() => {
       const from = msg.chat.id;
@@ -148,6 +161,9 @@ function bot(torrent, bot) {
         }, {
           text: "Terabox",
           callback_data: "terabox"
+        }], [{
+          text: "ios-content",
+          callback_data: "ios-content"
         }]]
       };
       const opts = {
@@ -159,29 +175,16 @@ function bot(torrent, bot) {
   bot.onText(setcategoryRegex, async (msg, match) => {
     checkUser(() => {
       const from = msg.chat.id;
+      const inkeyboard = [];
+      for (let i = 0; i < categories.length; i++) {
+        const tempArr = categories.slice(i * 2, Math.min(i * 2 + 2, categories.length));
+        inkeyboard.push(tempArr.map(e => ({
+          text: e.label,
+          callback_data: e.value
+        })));
+      }
       var keyboard = {
-        inline_keyboard: [[{
-          text: "Webseries",
-          callback_data: 1
-        }, {
-          text: "English",
-          callback_data: 2
-        }], [{
-          text: "English Premium",
-          callback_data: 3
-        }, {
-          text: "Desi",
-          callback_data: 4
-        }], [{
-          text: "English Bulk",
-          callback_data: 5
-        }, {
-          text: "Tango&onlyfans",
-          callback_data: 6
-        }], [{
-          text: "18 plus",
-          callback_data: 7
-        }]]
+        inline_keyboard: inkeyboard
       };
       const opts = {
         reply_markup: JSON.stringify(keyboard)
