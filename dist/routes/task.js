@@ -222,9 +222,9 @@ router.post("/start", async (req, res) => {
 });
 router.get("/backupMessage", async (req, res) => {
   try {
-    const defaultText = `Friends Now a days Telegram Is Banning Many Movies Channels. Our Channels Also Got Banned. So, Please Join This Backup Channel For Future Update.
+    const defaultText = `Friends Nowadays Telegram Is Banning Many Movies Channels. Our Channels Also Got Banned. So, Please Join This Backup Channel For Future Updates.
 
-If Telegram Ban Our Channel We Will Give You New Channel Link On This Channel.
+  If Telegram Ban Our Channel We Will Give You New Channel Link On This Channel.  
 
 
 दोस्तों आजकल टेलीग्राम कई चैनलों पर प्रतिबंध लगा रहा है। हमारे कई चैनलों पर भी प्रतिबंध लगा दिया। इसलिए, भविष्य के अपडेट के लिए कृपया इस बैकअप चैनल से जुड़ें। 
