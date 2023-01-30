@@ -260,7 +260,7 @@ const indexOfAll = (array, searchItem) => {
 };
 const getMessageBoldEntities = clStr => {
   var urlRegex = /(https?:\/\/[^\s]+)/g;
-  const urls = clStr.match(urlRegex);
+  const urls = clStr.match(urlRegex) || [];
   return urls.reduce((acArr, element, index) => {
     let aUrl = urls[index];
     const allIndex = indexOfAll(clStr, aUrl);
