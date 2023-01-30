@@ -259,16 +259,22 @@ const indexOfAll = (array, searchItem) => {
   return indexes;
 };
 const getMessageBoldEntities = clStr => {
-  var urlRegex = /(https?:\/\/[^\s]+)/g;
+  var urlRegex = /(https?:\/\/[^\s]+)|(@[a-zA-Z0-9_-]*)/g;
   const urls = clStr.match(urlRegex) || [];
+  const resultObj = {};
   return urls.reduce((acArr, element, index) => {
     let aUrl = urls[index];
     const allIndex = indexOfAll(clStr, aUrl);
-    return uniqBy([...acArr, ...allIndex.map(e => ({
-      offset: e,
-      length: aUrl.length,
-      type: "bold"
-    }))], "offset");
+    if (!resultObj[aUrl]) {
+      resultObj[aUrl] = allIndex;
+      return uniqBy([...acArr, ...allIndex.map(e => ({
+        offset: e,
+        length: aUrl.length,
+        type: "bold"
+      }))], "offset");
+    } else {
+      return acArr;
+    }
   }, []);
 };
 module.exports = {
