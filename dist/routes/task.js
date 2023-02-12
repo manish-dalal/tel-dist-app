@@ -220,6 +220,31 @@ router.post("/start", async (req, res) => {
     });
   }
 });
+router.get("/autostartbot", async (req, res) => {
+  try {
+    const {
+      linkType
+    } = req.query;
+    const {
+      data
+    } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}&linkType[0]=${linkType}`);
+    for (const task of data.tasks) {
+      startQueue.push(task);
+    }
+    console.log("Send add response", data.tasks.length);
+    res.json({
+      error: false,
+      msg: "Added in Queue"
+    });
+  } catch (e) {
+    // console.log("eeeeee", e);
+    Logger.error(e.message || "taskstart error occured");
+    res.json({
+      error: true,
+      errorMessage: e.message
+    });
+  }
+});
 router.get("/backupMessage", async (req, res) => {
   try {
     const defaultText = `Friends Nowadays Telegram Is Banning Many Movies Channels. Our Channels Also Got Banned. So, Please Join This Backup Channel For Future Updates.
@@ -246,7 +271,7 @@ _CHANNEL_
     } = req.query;
     const {
       data
-    } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}`);
+    } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}&linkType[0]=${linkType}`);
     const filterData = data.tasks.filter(e => e.linkType === linkType);
     if (text) {
       filterData.forEach(el => {

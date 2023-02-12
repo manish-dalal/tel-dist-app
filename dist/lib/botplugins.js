@@ -55,12 +55,12 @@ const renameUrl = "https://diskuploader.mypowerdisk.com/v1/tp/info";
 // param = {'token': 'l3ae9WQ7ru5ys5Dxxc3O','rid':'MZdAES','filename':'name_1'}
 
 const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL || "https://data.mongodb-api.com/app/tracker1-smsai/endpoint";
-const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChannelName = false) => {
+const removeUsername = (str, maniChannelName = config.CHANNEL) => {
   // console.log("dddffff", _.get(config, "REMOVE_CHANNEL_NAME", true));
   // true Not remove name
   // false Remove name (default)
-  const check = JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true")) || ignoreRemoveChannelName;
-  if (!check) {
+  const check = !JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true")) || config.ACTIVE_LINK_TYPE === "ios-content";
+  if (check) {
     return str;
   }
   const channelName = !maniChannelName ? "" : "@" + maniChannelName;
@@ -361,6 +361,7 @@ const processMessages = async bot => {
       console.log("inddddddex", processStats.current, "of ", processStats.total);
       console.log("Next data Length", processStats.nextData);
       let chatId = msg === null || msg === void 0 ? void 0 : (_msg$chat = msg.chat) === null || _msg$chat === void 0 ? void 0 : _msg$chat.id;
+      const entities = msg.entities || msg.caption_entities || [];
       try {
         // for for saving message to db
         if (mode === iMode.SAVEDB && mongoApiUrl) {
@@ -414,6 +415,10 @@ const processMessages = async bot => {
             }
             if (config.CNAME) {
               params.cname = config.CNAME;
+            }
+            console.log("activeLinkType", activeLinkType, entities.length);
+            if (activeLinkType === "ios-content" && entities.length) {
+              params.entities = JSON.stringify(entities);
             }
             const res1 = await axios.post(`${mongoApiUrl}/savemessage`, params);
             // if (lastMessageData.message_id && chatId === lastMessageData.chat.id) {
@@ -493,7 +498,7 @@ const processMessages = async bot => {
               useCustomMessage = false
             } = msg;
             const backupChannelLink = backLink || config.BACKUP_CHANNEL_LINK;
-            let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, true);
+            let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName);
             const clStrTemp = isNewMdisk ? await multiLinkCon({
               mlStr: clStr,
               mode: iMode.MDISK,
@@ -510,7 +515,7 @@ const processMessages = async bot => {
               maniChannelName,
               useCustomMessage: true
             }) : clStr;
-            const boldEntities = getMessageBoldEntities(clStr);
+            const boldEntities = msg.entities ? JSON.parse(msg.entities) : getMessageBoldEntities(clStr);
             clStr = addFooterToAutoMesage({
               msg: clStr,
               linkType
@@ -519,19 +524,21 @@ const processMessages = async bot => {
               caption: clStr.slice(0, 1025),
               caption_entities: JSON.stringify(boldEntities)
             };
-            const {
-              ALL_CHANNEL_LINK = ""
-            } = config;
-            const channelButtons = [{
-              text: "🙏 Backup Channel",
-              url: backupChannelLink || `https://t.me/${maniChannelName}`
-            }, {
-              text: "🔞👉 All Channel Link",
-              url: ALL_CHANNEL_LINK || `https://t.me/${maniChannelName}`
-            }];
-            opts["reply_markup"] = {
-              inline_keyboard: [channelButtons]
-            };
+            if (activeLinkType === "ios-content") {
+              const {
+                ALL_CHANNEL_LINK = ""
+              } = config;
+              const channelButtons = [{
+                text: "🙏 Backup Channel",
+                url: backupChannelLink || `https://t.me/${maniChannelName}`
+              }, {
+                text: "🔞👉 All Channel Link",
+                url: ALL_CHANNEL_LINK || `https://t.me/${maniChannelName}`
+              }];
+              opts["reply_markup"] = {
+                inline_keyboard: [channelButtons]
+              };
+            }
             const {
               bot: botFinal,
               error
