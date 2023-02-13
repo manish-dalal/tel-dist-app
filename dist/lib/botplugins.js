@@ -524,7 +524,7 @@ const processMessages = async bot => {
               caption: clStr.slice(0, 1025),
               caption_entities: JSON.stringify(boldEntities)
             };
-            if (activeLinkType === "ios-content") {
+            if (activeLinkType !== "ios-content") {
               const {
                 ALL_CHANNEL_LINK = ""
               } = config;
