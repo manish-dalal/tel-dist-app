@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "DEBUG=app NODE_ENV=dev nodemon --exec babel-node index.js",
+    "build": "echo hello",
     "build-web": "cd web && npm install && npm run build",
     "build-main": "rm -rf dist && ./node_modules/.bin/babel . --out-dir dist --ignore node_modules,web,config.dev.js,proxy.js && mkdir -p dist/web && cp -r web/build dist/web/build && touch dist/logs.txt",
     "serve": "node dist/index.js",
