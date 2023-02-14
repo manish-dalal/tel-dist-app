@@ -221,7 +221,8 @@ const convertMessageBody = (links, mlStr = "") => {
   const header = config.MESSAGE_HEADER || "📥 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐋𝐢𝐧𝐤𝐬/👀𝐖𝐚𝐭𝐜𝐡 𝐎𝐧𝐥𝐢𝐧𝐞\n\n";
   const footer = config.MESSAGE_FOOTER || `\n⬤▬▬▬▬▬▬▬▬▬▬▬▬▬⬤\n`;
   const subHeader = mlStr && mlStr.substring(0, mlStr.indexOf(links[0])).replaceAll("Video 1. 👉 ", "");
-  let str = subHeader && !subHeader.toLowerCase().includes("today") ? subHeader : header;
+  const subHeaderLower = subHeader && subHeader.toLowerCase();
+  let str = subHeader && !(subHeaderLower.includes("today") || subHeaderLower.includes("xkhub")) ? subHeader : header;
   links.forEach((el, index) => {
     str = `${str}Video ${index + 1}. 👉 ${el} \n\n`;
   });
