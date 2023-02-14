@@ -55,12 +55,12 @@ const renameUrl = "https://diskuploader.mypowerdisk.com/v1/tp/info";
 // param = {'token': 'l3ae9WQ7ru5ys5Dxxc3O','rid':'MZdAES','filename':'name_1'}
 
 const mongoApiUrl = config.MONGO_API_URL === "null" ? "" : config.MONGO_API_URL || "https://data.mongodb-api.com/app/tracker1-smsai/endpoint";
-const removeUsername = (str, maniChannelName = config.CHANNEL) => {
+const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChannelName = false) => {
   // console.log("dddffff", _.get(config, "REMOVE_CHANNEL_NAME", true));
   // true Not remove name
   // false Remove name (default)
-  const check = !JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true")) || config.ACTIVE_LINK_TYPE === "ios-content";
-  if (check) {
+  const check = JSON.parse(_.get(config, "REMOVE_CHANNEL_NAME", "true")) || ignoreRemoveChannelName;
+  if (!check) {
     return str;
   }
   const channelName = !maniChannelName ? "" : "@" + maniChannelName;
@@ -498,7 +498,8 @@ const processMessages = async bot => {
               useCustomMessage = false
             } = msg;
             const backupChannelLink = backLink || config.BACKUP_CHANNEL_LINK;
-            let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName);
+            const ignoreRemoveChannelNameFlag = config.ACTIVE_LINK_TYPE !== "ios-content";
+            let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, ignoreRemoveChannelNameFlag);
             const clStrTemp = isNewMdisk ? await multiLinkCon({
               mlStr: clStr,
               mode: iMode.MDISK,
