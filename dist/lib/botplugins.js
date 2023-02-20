@@ -499,7 +499,8 @@ const processMessages = async bot => {
               useCustomMessage = false
             } = msg;
             const backupChannelLink = backLink || config.BACKUP_CHANNEL_LINK;
-            const ignoreRemoveChannelNameFlag = config.ACTIVE_LINK_TYPE !== "ios-content";
+            const isLinktypeIos = linkType === "ios-content";
+            const ignoreRemoveChannelNameFlag = !isLinktypeIos;
             let clStr = ignoreRemoveChannelName ? msg.text : removeUsername(msg.text, maniChannelName, ignoreRemoveChannelNameFlag);
             const clStrTemp = isNewMdisk ? await multiLinkCon({
               mlStr: clStr,
@@ -526,7 +527,7 @@ const processMessages = async bot => {
               caption: clStr.slice(0, 1025),
               caption_entities: JSON.stringify(boldEntities)
             };
-            if (activeLinkType !== "ios-content") {
+            if (!isLinktypeIos) {
               const {
                 ALL_CHANNEL_LINK = ""
               } = config;
@@ -556,7 +557,7 @@ const processMessages = async bot => {
               const tempUrl = `https://drive.google.com/uc?export=view&id=${imgDriveId}`;
               imageUrl = thumbUrl || (cloudinaryUrl ? `${cloudinaryUrl}?${(Math.random() * 100).toFixed()}` : tempUrl);
               console.log("imageUrl##", imageUrl);
-              if (opts.caption) {
+              if (opts.caption || isLinktypeIos) {
                 const sendData = !(error !== null && error !== void 0 && error.message) && (await botFinal.sendPhoto(targetChatId, imageUrl, opts));
                 // console.log("sendData###", sendData);
               }
