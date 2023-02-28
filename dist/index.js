@@ -18,8 +18,9 @@ const {
   getAuthURL,
   getAuthToken
 } = require("./utils/gdrive");
-const search = require("./routes/search");
-const details = require("./routes/details");
+
+// const search = require("./routes/search");
+// const details = require("./routes/details");
 const torrent = require("./routes/torrent");
 const task = require("./routes/task");
 const category = require("./routes/category");
@@ -104,8 +105,8 @@ server.use("/api/v1/drive/getAuthToken", async (req, res) => {
   }
 });
 server.use("/api/v1/torrent", torrent);
-server.use("/api/v1/search", search);
-server.use("/api/v1/details", details);
+// server.use("/api/v1/search", search);
+// server.use("/api/v1/details", details);
 server.use("/api/v1/task", task);
 server.use("/api/v1/category", category);
 server.use("/api/v1/chatjoin", joinRequests);
