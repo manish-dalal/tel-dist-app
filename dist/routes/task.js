@@ -267,7 +267,8 @@ _CHANNEL_
       linkType,
       text = defaultText,
       thumbUrl = "",
-      channel = ""
+      channel = "",
+      entities = ""
     } = req.query;
     const {
       data
@@ -277,6 +278,10 @@ _CHANNEL_
       filterData.forEach(el => {
         const mainChannel = channel ? channel : `@${el.channelName}`;
         const fText = text.replace(/_CHANNEL_/g, mainChannel);
+        const entitiesObj = entities ? {
+          entities,
+          linkType
+        } : {};
         const msg = {
           text: fText,
           targetChatId: el.groupInfo.id,
@@ -284,6 +289,7 @@ _CHANNEL_
           isEuOrgLink: false,
           isNewMdisk: false,
           thumbUrl,
+          ...entitiesObj,
           ignoreRemoveChannelName: true
         };
         pushInMessageQueue({
