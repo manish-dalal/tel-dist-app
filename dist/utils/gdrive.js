@@ -80,7 +80,7 @@ async function authorize() {
   }
 }
 function getAuthURL(CLIENT_ID, CLIENT_SECRET) {
-  const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, "urn:ietf:wg:oauth:2.0:oob");
+  const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, "https://www.google.com/re");
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES
@@ -89,7 +89,7 @@ function getAuthURL(CLIENT_ID, CLIENT_SECRET) {
 }
 function getAuthToken(CLIENT_ID, CLIENT_SECRET, AUTH_CODE) {
   return new Promise((resolve, reject) => {
-    const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, "urn:ietf:wg:oauth:2.0:oob");
+    const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, "https://www.google.com/re");
     oAuth2Client.getToken(AUTH_CODE, (err, token) => {
       err ? reject(err) : resolve(token);
     });
