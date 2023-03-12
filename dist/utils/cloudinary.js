@@ -5,7 +5,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 // import { v2 as cloudinary } from "cloudinary";
-const cloudinary = {};
+const cloudinary = {
+  config: () => ({
+    api_secret: "",
+    cloud_name: "",
+    api_key: ""
+  })
+};
 const config = require("../config");
 
 // Configure your cloud name, API key and API secret:

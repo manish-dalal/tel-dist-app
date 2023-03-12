@@ -6,7 +6,13 @@ Object.defineProperty(exports, "__esModule", {
 exports.getCloudinarySignature = void 0;
 require("./cloudinary");
 // import { v2 as cloudinary } from "cloudinary";
-const cloudinary = {};
+const cloudinary = {
+  config: () => ({
+    api_secret: "",
+    cloud_name: "",
+    api_key: ""
+  })
+};
 const getCloudinarySignature = (folder = "m1") => {
   const apiSecret = cloudinary.config().api_secret;
   const cloudName = cloudinary.config().cloud_name;
