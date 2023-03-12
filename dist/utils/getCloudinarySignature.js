@@ -4,14 +4,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getCloudinarySignature = void 0;
-var _cloudinary = require("cloudinary");
 require("./cloudinary");
+// import { v2 as cloudinary } from "cloudinary";
+const cloudinary = {};
 const getCloudinarySignature = (folder = "m1") => {
-  const apiSecret = _cloudinary.v2.config().api_secret;
-  const cloudName = _cloudinary.v2.config().cloud_name;
-  const apiKey = _cloudinary.v2.config().api_key;
+  const apiSecret = cloudinary.config().api_secret;
+  const cloudName = cloudinary.config().cloud_name;
+  const apiKey = cloudinary.config().api_key;
   const timestamp = Math.round(new Date().getTime() / 1000);
-  const signature = _cloudinary.v2.utils.api_sign_request({
+  const signature = cloudinary.utils.api_sign_request({
     timestamp: timestamp,
     folder
   }, apiSecret);

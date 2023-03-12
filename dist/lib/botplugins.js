@@ -25,8 +25,12 @@ const {
   convertMessageBody,
   getVivdiskTitle,
   addFooterToAutoMesage,
-  getMessageBoldEntities
+  getMessageBoldEntities,
+  getTeraboxTitle
 } = require("./botMethods");
+const {
+  convertTerboxLink
+} = require("./userMethods");
 let dataArray = [];
 let isMessageProcessing = false;
 let processStats = {};
@@ -82,11 +86,7 @@ const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChann
           return el.replace(/@.[a-zA-Z0-9_-]*/g, channelName);
         }
       } else if (el.includes("t.me") || el.includes("telegra.ph")) {
-        if (el.lastIndexOf("/") >= 0) {
-          return el.slice(0, el.lastIndexOf("/") + 1) + maniChannelName;
-        } else {
-          return channelName;
-        }
+        return "https://t.me/" + maniChannelName;
       }
       return el;
     });
@@ -197,8 +197,14 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       } = await convertVivdiskLink(link, 1, maniChannelName);
       console.log("attempt", attempt, "vivdisk data", newLink);
       return newLink;
+    } else if (link.includes("box") || link.includes("1024tera")) {
+      const newLink = await convertTerboxLink({
+        link: link,
+        numOfAttempt: 0
+      });
+      return newLink;
     } else {
-      return "";
+      return link;
     }
   } catch (error) {
     Logger.error(error.message || "mdiskUp error occured");
@@ -215,9 +221,7 @@ const duplicateFinder = async link => {
   try {
     const linkArr = link.split("/");
     const v_id = linkArr[linkArr.length - 1];
-    const params = {
-      link
-    };
+    const params = {};
     if (config.CNAME) {
       params.cname = config.CNAME;
     }
@@ -229,6 +233,7 @@ const duplicateFinder = async link => {
       if (mdiskLinkInfo.source) {
         params["source"] = mdiskLinkInfo.source;
       }
+      params.link = link;
       params.linkType = "mdisk";
     } else if (link.includes("dood.")) {
       const {
@@ -238,11 +243,19 @@ const duplicateFinder = async link => {
       params.length = info.length;
       params.title = info.title;
       params.linkType = "dood";
+      params.link = link;
     } else if (link.toLowerCase().includes("vivdisk")) {
       params.linkType = "vivdisk";
+      params.link = link;
+    } else if (link.includes("box") || link.includes("1024tera")) {
+      // getTitlr
+      const videoTitle = await getTeraboxTitle(link);
+      params.title = videoTitle;
+      params.linkType = "terabox";
+      params.link = !videoTitle ? "" : link;
     }
     let u_url = link;
-    if (mongoApiUrl) {
+    if (mongoApiUrl && params.link) {
       const url = `${mongoApiUrl}/r1addurl`;
       const {
         data
@@ -333,7 +346,7 @@ const multiLinkCon = async ({
       convMsg = removeUsername(convMsg, maniChannelName);
     }
     const finalStr = useCustomMessage ? convMsg : urls.reduce((acStr, element, index) => {
-      return acStr.replace(urls[index], newUrls[index]);
+      return acStr.replace(urls[index], newUrls[index] || "");
     }, clStr);
     return finalStr;
   }

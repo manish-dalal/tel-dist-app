@@ -52,6 +52,7 @@ const config = {
   MESSAGE_FOOTER: process.env.MESSAGE_FOOTER,
   CATEGORIES: process.env.CATEGORIES,
   ISFULLBOT: process.env.ISFULLBOT,
+  USER_TOKEN: process.env.USER_TOKEN,
   KEEP_CAPTION_TITLE: process.env.KEEP_CAPTION_TITLE
 };
 module.exports = config;
