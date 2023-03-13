@@ -453,12 +453,14 @@ const processMessages = async bot => {
             mlStr: msg.caption || msg.text,
             mode
           });
-          await sendMessage({
-            msg,
-            convertedStr,
-            bot,
-            chatId
-          });
+          if (JSON.parse(_.get(config, "DISABLE_SEND_MESSAGE", "false"))) {
+            await sendMessage({
+              msg,
+              convertedStr,
+              bot,
+              chatId
+            });
+          }
         } else if (mode === iMode.CHANNEL_REMOVER_KEEP_TERABOX) {
           // link conversion
           const convertedArr = await multiLinkCon({

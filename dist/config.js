@@ -53,6 +53,7 @@ const config = {
   CATEGORIES: process.env.CATEGORIES,
   ISFULLBOT: process.env.ISFULLBOT,
   USER_TOKEN: process.env.USER_TOKEN,
-  KEEP_CAPTION_TITLE: process.env.KEEP_CAPTION_TITLE
+  KEEP_CAPTION_TITLE: process.env.KEEP_CAPTION_TITLE,
+  DISABLE_SEND_MESSAGE: process.env.DISABLE_SEND_MESSAGE
 };
 module.exports = config;
