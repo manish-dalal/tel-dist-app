@@ -453,7 +453,7 @@ const processMessages = async bot => {
             mlStr: msg.caption || msg.text,
             mode
           });
-          if (JSON.parse(_.get(config, "DISABLE_SEND_MESSAGE", "false"))) {
+          if (!JSON.parse(_.get(config, "DISABLE_SEND_MESSAGE", "false"))) {
             await sendMessage({
               msg,
               convertedStr,
