@@ -92,7 +92,8 @@ const removeUsername = (str, maniChannelName = config.CHANNEL, ignoreRemoveChann
     });
     return newStrArr.join(" ");
   });
-  return finalStr.join("\n");
+  const fstr = finalStr.join("\n").replace(/\d{1,2}[\-|\.|\/]\d{1,2}[\-|\.|\/]\d{2,4}/g, "");
+  return fstr;
 };
 const maxAttemptCount = parseInt(config.VIVDISK_RETRY) || 1;
 const convertVivdiskLink = async (link, attempt, maniChannelName) => {
