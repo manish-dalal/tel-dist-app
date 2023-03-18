@@ -27,27 +27,30 @@ const getUserClient = () => {
 };
 const checkConvertedWait = async ({
   link,
-  numOfAttempt = 0
+  numOfAttempt = 0,
+  message
 }) => {
   return new Promise(async (resolve, reject) => {
     const client = await getUserClient();
-    await sleep(4000);
+    await sleep(8000 * (numOfAttempt + 1));
     const result = await client.invoke(new Api.messages.GetHistory({
       peer: "@LinkConvertTerabot",
       addOffset: 0,
-      limit: 1,
+      limit: 4,
       maxId: 0,
       minId: 0
     }));
-    const messages = result.messages.map(e => e.message);
-    if (messages[0] !== link) {
-      return resolve(messages[0]);
+    const messages = result.messages;
+    const fromId = message.fromId.userId;
+    if (!messages[0].fromId && messages[0].message !== link) {
+      return resolve(messages[0].message);
     } else if (numOfAttempt > 1) {
       return resolve("");
     } else {
       const resp = await checkConvertedWait({
         link,
-        numOfAttempt: numOfAttempt + 1
+        numOfAttempt: numOfAttempt + 1,
+        message
       });
       return resolve(resp);
     }
@@ -64,7 +67,8 @@ const convertTerboxLink = async ({
     });
     const resp = await checkConvertedWait({
       link,
-      numOfAttempt: 0
+      numOfAttempt: 0,
+      message: aaa
     });
     if (resp !== link) {
       return resp;

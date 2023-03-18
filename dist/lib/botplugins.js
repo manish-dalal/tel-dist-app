@@ -205,7 +205,7 @@ const mdiskUp = async (url, maniChannelName = config.CHANNEL) => {
       });
       return newLink;
     } else {
-      return link;
+      return link.includes("t.me") ? link : "";
     }
   } catch (error) {
     Logger.error(error.message || "mdiskUp error occured");
@@ -326,7 +326,8 @@ const multiLinkCon = async ({
   let newUrls = await getConvertedLink(urls, mode);
   newUrls = newUrls.filter(n => n);
   let finalArr = [];
-  if (!newUrls.length) {
+  const tempNewArr = newUrls.filter(n => n && !n.includes("t.me"));
+  if (!tempNewArr.length) {
     // No link in msg
     return "";
   }

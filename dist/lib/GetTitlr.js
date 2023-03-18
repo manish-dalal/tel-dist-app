@@ -22,14 +22,25 @@ var x = Xray();
 //   console.log(rest); // Google
 // });
 
-x("https://teraboxapp.com/s/1Eos7hTbZrdwUQVENu9iWGw", ".main-box@html")(function (err, ...rest) {
-  console.log("err", err);
-  console.log("rest", rest); // Google
-});
+// x(
+//   "https://teraboxapp.com/s/1Eos7hTbZrdwUQVENu9iWGw",
+//   ".main-box@html"
+// )(function (err, ...rest) {
+//   console.log("err", err);
+//   console.log("rest", rest); // Google
+// });
 
-x("https://teraboxapp.com/s/1Eos7hTbZrdwUQVENu9iWGw", "title")(function (err, title) {
-  const newTitle = title.split("- Share Files")[0];
-  console.log(newTitle); // Google
+// x(
+//   "https://teraboxapp.com/s/1Eos7hTbZrdwUQVENu9iWGw",
+//   "title"
+// )(function (err, title) {
+//   const newTitle = title.split("- Share Files")[0];
+//   console.log(newTitle); // Google
+// });
+
+x("https://teraboxapp.com/s/1fvkEdf-sk0wrSmQjWXSMjA", "head", ["[content]@content"])(function (err, rst) {
+  console.log(err);
+  console.log(rst);
 });
 
 // #cover > div.video-durations.t-14.t-white
