@@ -251,7 +251,11 @@ const duplicateFinder = async link => {
     } else if (link.includes("box") || link.includes("1024tera")) {
       // getTitlr
       const videoTitle = await getTeraboxTitle(link);
-      params.title = videoTitle;
+      const newTitle = videoTitle.replaceAll(/[\(]\d*[\)]/gm, "");
+      if (newTitle !== videoTitle) {
+        params.orignalTitle = videoTitle;
+      }
+      params.title = newTitle;
       params.linkType = "terabox";
       params.link = !videoTitle ? "" : link;
     }
