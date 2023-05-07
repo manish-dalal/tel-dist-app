@@ -138,17 +138,17 @@ function bot(torrent, bot) {
         try {
           let res = await bot.sendMessage(chatID, "deleting");
           // console.log("res", res);
-        } catch (e) {
-          console.log('errroror', get(e, 'message', ''));
-        }
-        for (let i = res.message_id; i >= 0; i--) {
-          console.log(`chat_id: ${chatID}, message_id: ${i}`);
-          try {
-            let res = await bot.deleteMessage(chatID, i);
-            // console.log(res);
-          } catch (e) {
-            // console.error(e);
+          for (let i = res.message_id; i >= 0; i--) {
+            console.log(`chat_id: ${chatID}, message_id: ${i}`);
+            try {
+              let res1 = await bot.deleteMessage(chatID, i);
+              // console.log(res);
+            } catch (e) {
+              console.log("errroror 2", get(e, "message", ""));
+            }
           }
+        } catch (e) {
+          console.log("errroror", get(e, "message", ""));
         }
       }
     }, msg);
