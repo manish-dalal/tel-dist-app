@@ -6,7 +6,8 @@ const axios = require("axios");
 const {
   pushInMessageQueue,
   iMode,
-  getProcessStats
+  getProcessStats,
+  getDataArray
 } = require("../lib/botplugins");
 const {
   Logger
@@ -310,6 +311,62 @@ _CHANNEL_
     });
   }
 });
+
+// {
+//   "msg": {
+//     "imgDriveId": "1r-1bIKFFTIFDXGmVrzTrYkFmZAecOW3w",
+//     "text": "Latest Exclusive ",
+//     "cloudinaryUrl": "",
+//     "targetChatId": -1001655567871,
+//     "thumbUrl": "",
+//     "linkType": "mdisk",
+//     "maniChannelName": "primexmov",
+//     "backupChannelLink": "",
+//     "isEuOrgLink": true,
+//     "isNewMdisk": false,
+//     "useCustomMessage": false
+//   },
+//   "mode": 121
+// },
+router.post("/sendMessages", async (req, res) => {
+  try {
+    const defaultText = `..`;
+    const {
+      linkType,
+      text = defaultText,
+      thumbUrl = "",
+      channels = '[]'
+    } = req.body;
+    const filterData = JSON.parse(channels);
+    if (text) {
+      filterData.forEach(el => {
+        const msg = {
+          text,
+          targetChatId: `-100${el.channelId}`,
+          maniChannelName: '',
+          isEuOrgLink: false,
+          isNewMdisk: false,
+          thumbUrl,
+          ignoreRemoveChannelName: true
+        };
+        pushInMessageQueue({
+          msg,
+          mode: iMode.DBMESSAGESENDER
+        });
+      });
+    }
+    res.json({
+      error: false,
+      msg: text ? "Sucess" : "No text found"
+    });
+  } catch (e) {
+    Logger.error(e.message || "tasklist error occured");
+    res.json({
+      error: true,
+      errorMessage: e.message
+    });
+  }
+});
 router.get("/telegramget", async (req, res) => {
   try {
     const {
@@ -331,6 +388,17 @@ router.get("/processStats", async (req, res) => {
     return res.json(getProcessStats());
   } catch (error) {
     Logger.error(error.message || "processStats api error occured");
+    return res.json({
+      error: true,
+      error: error.message
+    });
+  }
+});
+router.get("/dataarray", async (req, res) => {
+  try {
+    return res.json(getDataArray());
+  } catch (error) {
+    Logger.error(error.message || "getDataArray api error occured");
     return res.json({
       error: true,
       error: error.message

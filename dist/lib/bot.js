@@ -40,7 +40,6 @@ const getcategoryRegex = /\/getcategory/;
 const setcategoryRegex = /(\/setcategory|\/setcategory (.+))/;
 const setlinktypeRegex = /(\/setlinktype|\/setlinktype (.+))/;
 const getlinktypeRegex = /\/getlinktype/;
-const deleteAllRegex = /\/deleteAll (.+)/;
 const startMessage = `
 Welcome, here are some commands to get you started:
 
@@ -128,29 +127,6 @@ function bot(torrent, bot) {
   bot.onText(/\/getprocessstats/, async msg => {
     checkUser(() => {
       bot.sendMessage(msg.chat.id, JSON.stringify(getProcessStats(), null, 4));
-    }, msg);
-  });
-  bot.onText(deleteAllRegex, (msg, match) => {
-    checkUser(async () => {
-      const chatID = get(match, "[1]", "");
-      // console.log("chatID", chatID);
-      if (chatID) {
-        try {
-          let res = await bot.sendMessage(chatID, "deleting");
-          // console.log("res", res);
-          for (let i = res.message_id; i >= 0; i--) {
-            console.log(`chat_id: ${chatID}, message_id: ${i}`);
-            try {
-              let res1 = await bot.deleteMessage(chatID, i);
-              // console.log(res);
-            } catch (e) {
-              console.log("errroror 2", get(e, "message", ""));
-            }
-          }
-        } catch (e) {
-          console.log("errroror", get(e, "message", ""));
-        }
-      }
     }, msg);
   });
   bot.onText(getcategoryRegex, async (msg, match) => {

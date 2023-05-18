@@ -622,9 +622,11 @@ const pushInMessageQueue = element => {
   dataArray.push(element);
 };
 const getProcessStats = () => processStats;
+const getDataArray = () => dataArray;
 module.exports = {
   processMessages,
   pushInMessageQueue,
   iMode,
-  getProcessStats
+  getProcessStats,
+  getDataArray
 };
