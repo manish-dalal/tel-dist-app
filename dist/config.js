@@ -19,7 +19,7 @@ const config = {
   SITE: process.env.SITE,
   TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
   GDRIVE_TOKEN: process.env.GDRIVE_TOKEN,
-  PORT: process.env.PORT || 5000,
+  PORT: process.env.PORT || 5010,
   MONGO_API_URL: process.env.MONGO_API_URL,
   CHANNEL: process.env.CHANNEL,
   REPLACE_TEXTS: process.env.REPLACE_TEXTS || "[]",
@@ -52,7 +52,8 @@ const config = {
   MESSAGE_FOOTER: process.env.MESSAGE_FOOTER,
   CATEGORIES: process.env.CATEGORIES,
   ISFULLBOT: process.env.ISFULLBOT,
-  USER_TOKEN: process.env.USER_TOKEN,
+  TERABOX_ADMIN_USER_TOKEN: process.env.TERABOX_ADMIN_USER_TOKEN,
+  JOIN_CHANNEL_USER_TOKEN: process.env.JOIN_CHANNEL_USER_TOKEN,
   KEEP_CAPTION_TITLE: process.env.KEEP_CAPTION_TITLE,
   DISABLE_SEND_MESSAGE: process.env.DISABLE_SEND_MESSAGE
 };
