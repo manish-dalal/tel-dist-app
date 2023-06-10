@@ -152,9 +152,14 @@ setInterval(async () => {
             filteredfullChat["restrictionReason"] = get(fullChat, "result.chats[0].restrictionReason", null);
           }
           const fullChatObj = !isEmpty(fullChat) ? {
-            fullChat: filteredfullChat,
-            groupInfo: fullChat.chatInvite
+            fullChat: filteredfullChat
           } : {};
+          if (!isEmpty(fullChat.chatInvite)) {
+            fullChatObj["groupInfo"] = {
+              ...groupInfo,
+              ...fullChat.chatInvite
+            };
+          }
           let taskUpdatedData = {
             ...membersCountObj,
             ...fullChatObj
