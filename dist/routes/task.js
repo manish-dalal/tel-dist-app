@@ -137,10 +137,6 @@ setInterval(async () => {
             groupInfo,
             _id
           } = task;
-          const membersCount = await getChatMembersCount(config.TELEGRAM_TOKEN, groupInfo.id);
-          const membersCountObj = membersCount ? {
-            membersCount
-          } : {};
           const fullChat = await getFullChannel({
             telegramToken: config.TELEGRAM_TOKEN,
             channel: groupInfo.id
@@ -150,6 +146,8 @@ setInterval(async () => {
           if (!isEmpty(fullChat.result)) {
             filteredfullChat["pts"] = get(fullChat, "result.fullChat.pts", 0);
             filteredfullChat["restrictionReason"] = get(fullChat, "result.chats[0].restrictionReason", null);
+            const participantsCount = get(data, "result.fullChat.participantsCount", 0);
+            participantsCount && (filteredfullChat["membersCount"] = participantsCount);
           }
           const fullChatObj = !isEmpty(fullChat) ? {
             fullChat: filteredfullChat
@@ -161,7 +159,6 @@ setInterval(async () => {
             };
           }
           let taskUpdatedData = {
-            ...membersCountObj,
             ...fullChatObj
           };
           const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, taskUpdatedData);
@@ -481,7 +478,10 @@ router.get("/telegramget", async (req, res) => {
 });
 router.get("/processStats", async (req, res) => {
   try {
-    return res.json(getProcessStats());
+    return res.json({
+      isQueueRunning,
+      ...getProcessStats()
+    });
   } catch (error) {
     Logger.error(error.message || "processStats api error occured");
     return res.json({
