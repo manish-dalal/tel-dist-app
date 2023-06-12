@@ -152,7 +152,8 @@ setInterval(async () => {
             participantsCount && (filteredfullChat["membersCount"] = participantsCount);
           }
           const fullChatObj = !isEmpty(fullChat) ? {
-            fullChat: filteredfullChat
+            fullChat: filteredfullChat,
+            membersCount: filteredfullChat.membersCount
           } : {};
           if (!isEmpty(fullChat.chatInvite)) {
             fullChatObj["groupInfo"] = {
