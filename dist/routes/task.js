@@ -125,6 +125,7 @@ setInterval(async () => {
           console.log("taskRes start", taskUpdateRes.data);
         }
       } catch (error) {
+        Logger.error("error startQueue" + error.message);
         isQueueRunning = false;
       }
     } else if (channelMetaDataQueue.length) {
@@ -141,12 +142,13 @@ setInterval(async () => {
             telegramToken: config.TELEGRAM_TOKEN,
             channel: groupInfo.id
           });
-          console.log("fullChat==", JSON.stringify(fullChat));
+          console.log("fullChat==");
+          console.log("fullChat==DATA", JSON.stringify(fullChat));
           const filteredfullChat = {};
           if (!isEmpty(fullChat.result)) {
             filteredfullChat["pts"] = get(fullChat, "result.fullChat.pts", 0);
             filteredfullChat["restrictionReason"] = get(fullChat, "result.chats[0].restrictionReason", null);
-            const participantsCount = get(data, "result.fullChat.participantsCount", 0);
+            const participantsCount = get(fullChat, "result.fullChat.participantsCount", 0);
             participantsCount && (filteredfullChat["membersCount"] = participantsCount);
           }
           const fullChatObj = !isEmpty(fullChat) ? {
@@ -161,10 +163,12 @@ setInterval(async () => {
           let taskUpdatedData = {
             ...fullChatObj
           };
+          // console.log("taskUpdatedData", JSON.stringify(taskUpdatedData));
           const taskUpdateRes = await axios.put(`${serverUrl}/task/v1/${_id}`, taskUpdatedData);
           console.log("taskRes metaData updated", taskUpdateRes.data);
         }
       } catch (error) {
+        Logger.error("error channelMetaDataQueue" + error.message);
         isQueueRunning = false;
       }
     }
