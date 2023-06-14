@@ -26,7 +26,10 @@ const getUserClient = type => {
       const apiId = 8779238;
       const apiHash = "41a0189c83fa2f1fb2805a37db370878";
       const session = new StringSession(userSessionToken || ""); // You should put your string session here
-      userClient = new TelegramClient(session, apiId, apiHash, {});
+      userClient = new TelegramClient(session, apiId, apiHash, {
+        connectionRetries: 2,
+        autoReconnect: false
+      });
       await userClient.connect();
       return resolve(userClient);
     }
