@@ -135,7 +135,7 @@ const getFullChannel = async ({
     const chatInvite = telegramToken && (await getChatInviteLink(telegramToken, channel));
     const link = get(chatInvite, "invite_link", "");
     try {
-      await sleep(1000);
+      await sleep(10 * 1000);
       const result = await client.invoke(new Api.channels.GetFullChannel({
         channel
       }));
