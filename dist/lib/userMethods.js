@@ -10,19 +10,14 @@ const {
   StringSession
 } = require("telegram/sessions");
 const config = require("../config");
-
-// TERABOX_ADMIN_USER_TOKEN
-// JOIN_CHANNEL_USER_TOKEN
-let teraboxAdminUserClient = null;
-let joinChannelUserClient = null;
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 const getUserClient = type => {
   return new Promise(async (resolve, reject) => {
-    let userClient = type === "joinChannelAdmin" ? joinChannelUserClient : teraboxAdminUserClient;
+    let userClient = null;
     const userSessionToken = type === "joinChannelAdmin" ? config.JOIN_CHANNEL_USER_TOKEN : config.TERABOX_ADMIN_USER_TOKEN;
-    if (userSessionToken && !userClient) {
+    if (userSessionToken) {
       const apiId = 8779238;
       const apiHash = "41a0189c83fa2f1fb2805a37db370878";
       const session = new StringSession(userSessionToken || ""); // You should put your string session here
@@ -33,7 +28,7 @@ const getUserClient = type => {
       await userClient.connect();
       return resolve(userClient);
     }
-    return resolve(userClient);
+    return resolve(null);
   });
 };
 const checkConvertedWait = async ({
