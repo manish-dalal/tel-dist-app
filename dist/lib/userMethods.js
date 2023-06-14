@@ -10,12 +10,16 @@ const {
   StringSession
 } = require("telegram/sessions");
 const config = require("../config");
+let userClient = null;
 const sleep = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 const getUserClient = type => {
   return new Promise(async (resolve, reject) => {
-    let userClient = null;
+    if (userClient) {
+      await userClient.destroy();
+      userClient = null;
+    }
     const userSessionToken = type === "joinChannelAdmin" ? config.JOIN_CHANNEL_USER_TOKEN : config.TERABOX_ADMIN_USER_TOKEN;
     if (userSessionToken) {
       const apiId = 8779238;
