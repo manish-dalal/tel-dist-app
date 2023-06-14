@@ -142,7 +142,7 @@ setInterval(async () => {
             telegramToken: config.TELEGRAM_TOKEN,
             channel: groupInfo.id
           });
-          console.log("fullChat==");
+          console.log("fullChat==", tempstartQueue.indexOf(task));
           console.log("fullChat==DATA", JSON.stringify(fullChat));
           const filteredfullChat = {};
           if (!isEmpty(fullChat.result)) {
