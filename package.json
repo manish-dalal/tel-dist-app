@@ -54,7 +54,7 @@
     "nodemon": "^2.0.20",
     "serve-index": "^1.9.1",
     "tall": "^8.0.0",
-    "telegram": "^2.15.10",
+    "telegram": "2.17.10",
     "webtorrent": "^1.8.19",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1",
