@@ -138,9 +138,23 @@ const getFullChannel = async ({
       const result = await client.invoke(new Api.channels.GetFullChannel({
         channel
       }));
+      const finalRespose = {
+        channelId: get(result, "chats[0].id", ""),
+        channelName: get(result, "chats[0].title", ""),
+        username: get(result, "chats[0].username", ""),
+        fullChatLogs: [{
+          pts: get(result, "fullChat.pts", 0),
+          restrictionReason: get(result, "chats[0].restrictionReason", ""),
+          participantsCount: get(result, "fullChat.participantsCount", 0),
+          date: new Date().toISOString()
+        }]
+      };
+      const chatInfo = await axios.post(`${config.SERVER_SITE}/channel/${get(result, "chats[0].id", "")}`, finalRespose);
+      const chatInfoLogs = chatInfo.data;
       return resolve({
         result,
-        chatInvite
+        chatInvite,
+        chatInfoLogs
       });
     } catch (error) {
       if (maxRetry >= 0) {
