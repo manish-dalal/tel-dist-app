@@ -134,7 +134,7 @@ const getFullChannel = async ({
     const chatInvite = telegramToken && (await getChatInviteLink(telegramToken, channel));
     const link = get(chatInvite, "invite_link", "");
     try {
-      await sleep(10 * 1000);
+      await sleep((telegramToken ? 10 : 1) * 1000);
       const result = await client.invoke(new Api.channels.GetFullChannel({
         channel
       }));
@@ -168,6 +168,14 @@ const getFullChannel = async ({
           maxRetry: maxRetry - 1
         });
         return resolve(resData);
+      } else if (!telegramToken) {
+        const chatInfo = await axios.get(`${config.SERVER_SITE}/channel/${channel.replace("-100", "")}`);
+        const chatInfoLogs = chatInfo.data;
+        return resolve({
+          result: {},
+          chatInvite: {},
+          chatInfoLogs
+        });
       }
       return resolve({});
     }
