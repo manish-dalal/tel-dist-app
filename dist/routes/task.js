@@ -322,13 +322,17 @@ router.get("/getMetaData", async (req, res) => {
 router.get("/autostartbot", async (req, res) => {
   try {
     const {
-      linkType
+      linkType,
+      numberOfTimes = 1
     } = req.query;
     const {
       data
     } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}&linkType[0]=${linkType}`);
     for (const task of data.tasks) {
-      startQueue.push(task);
+      startQueue.push(task.map(e => ({
+        ...e,
+        numberOfTimes
+      })));
     }
     console.log("Send add response", data.tasks.length);
     res.json({
