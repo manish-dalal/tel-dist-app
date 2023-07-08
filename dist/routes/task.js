@@ -329,10 +329,10 @@ router.get("/autostartbot", async (req, res) => {
       data
     } = await axios.get(`${serverUrl}/task/v1/list?botToken=${config.TELEGRAM_TOKEN}&linkType[0]=${linkType}`);
     for (const task of data.tasks) {
-      startQueue.push(task.map(e => ({
-        ...e,
-        numberOfTimes
-      })));
+      startQueue.push({
+        ...task,
+        numberOfTimes: parseInt(numberOfTimes)
+      });
     }
     console.log("Send add response", data.tasks.length);
     res.json({
