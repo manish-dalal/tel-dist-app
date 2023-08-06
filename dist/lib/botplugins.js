@@ -277,6 +277,38 @@ const duplicateFinder = async link => {
     return "";
   }
 };
+const duplicateOnlyUltra = async link => {
+  try {
+    const linkTitle = link.split("Link: watch now")[0].replace("\n", "").trim();
+    if (linkTitle && link.includes("Link: watch now")) {
+      const params = {
+        linkType: "ios-content",
+        link: linkTitle,
+        title: link
+      };
+      if (config.CNAME) {
+        params.cname = config.CNAME;
+      }
+      let u_url = link;
+      if (mongoApiUrl && params.link) {
+        const url = `${mongoApiUrl}/r1addurl`;
+        const {
+          data
+        } = await axios.post(url, params);
+        console.log("Insert into DB", data);
+        const errorMsg = _.get(data, "msg", "");
+        if (errorMsg.includes("Already have url")) {
+          u_url = "";
+        }
+      }
+      return u_url;
+    }
+    return link;
+  } catch (error) {
+    console.log("error", error);
+    return "";
+  }
+};
 const getConvertedLink = async (urls, mode) => {
   const new_urls = [];
   const urls_dict = {};
@@ -389,63 +421,70 @@ const processMessages = async bot => {
             let imgDriveId = "";
             let cloudinaryUrl = "";
             const clStr = removeUsername(msg.caption || msg.text);
-            if (msg.photo) {
-              try {
-                const {
-                  mimeType,
-                  fileName,
-                  fileId
-                } = getFileData(msg, activeLinkType, config.CNAME);
-                console.log("mimeType, fileName, fileId", mimeType, fileName, fileId);
-                const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
-                imgDriveId = uploadedFile.data.id;
-              } catch (error) {
-                console.log("uplaoa img error", error);
-                console.log("great msg", JSON.stringify(msg));
-              }
-              const sigData = getCloudinarySignature(`${activeLinkType}1`);
-              if (imgDriveId && sigData.apikey && sigData.signature) {
+            let isNewData = true;
+            if (activeLinkType === "ios-content" && category == 26) {
+              const returnText = await duplicateOnlyUltra(clStr);
+              isNewData = !!returnText;
+            }
+            if (isNewData) {
+              if (msg.photo) {
                 try {
-                  const formData = new URLSearchParams();
-                  // `https://drive.google.com/uc?export=view&id=${imgDriveId}`
-                  const driveUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
-                  formData.append("file", driveUrl);
-                  formData.append("api_key", sigData.apikey);
-                  formData.append("timestamp", sigData.timestamp);
-                  formData.append("signature", sigData.signature);
-                  formData.append("folder", sigData.folder);
-                  const url = "https://api.cloudinary.com/v1_1/" + sigData.cloudname + "/auto/upload";
                   const {
-                    data: cuData = {}
-                  } = await axios.post(url, formData);
-                  cloudinaryUrl = cuData.secure_url;
-                } catch (cuerror) {
-                  console.log("cuerror", cuerror);
+                    mimeType,
+                    fileName,
+                    fileId
+                  } = getFileData(msg, activeLinkType, config.CNAME);
+                  console.log("mimeType, fileName, fileId", mimeType, fileName, fileId);
+                  const uploadedFile = await uploadFileStream(fileName, bot.getFileStream(fileId));
+                  imgDriveId = uploadedFile.data.id;
+                } catch (error) {
+                  console.log("uplaoa img error", error);
+                  console.log("great msg", JSON.stringify(msg));
+                }
+                const sigData = getCloudinarySignature(`${activeLinkType}1`);
+                if (imgDriveId && sigData.apikey && sigData.signature) {
+                  try {
+                    const formData = new URLSearchParams();
+                    // `https://drive.google.com/uc?export=view&id=${imgDriveId}`
+                    const driveUrl = `${config.SITE}api/v1/drive/file/temp.jpg?id=${imgDriveId}`;
+                    formData.append("file", driveUrl);
+                    formData.append("api_key", sigData.apikey);
+                    formData.append("timestamp", sigData.timestamp);
+                    formData.append("signature", sigData.signature);
+                    formData.append("folder", sigData.folder);
+                    const url = "https://api.cloudinary.com/v1_1/" + sigData.cloudname + "/auto/upload";
+                    const {
+                      data: cuData = {}
+                    } = await axios.post(url, formData);
+                    cloudinaryUrl = cuData.secure_url;
+                  } catch (cuerror) {
+                    console.log("cuerror", cuerror);
+                  }
                 }
               }
+              const params = {
+                imgDriveId,
+                text: clStr,
+                category: category.toString(),
+                linkType: activeLinkType
+              };
+              if (cloudinaryUrl && cloudinaryUrl.length) {
+                params.cloudinaryUrl = cloudinaryUrl;
+              }
+              if (config.CNAME) {
+                params.cname = config.CNAME;
+              }
+              console.log("activeLinkType", activeLinkType, entities.length);
+              if (activeLinkType === "ios-content" && entities.length) {
+                params.entities = JSON.stringify(entities);
+              }
+              const res1 = await axios.post(`${mongoApiUrl}/savemessage`, params);
+              // if (lastMessageData.message_id && chatId === lastMessageData.chat.id) {
+              //   bot.deleteMessage(chatId, lastMessageData.message_id);
+              // }
+              // const messageData = await bot.sendMessage(chatId, `Uploaded ${tempData.indexOf(el) + 1}/${tempData.length}`);
+              // lastMessageData = messageData;
             }
-            const params = {
-              imgDriveId,
-              text: clStr,
-              category: category.toString(),
-              linkType: activeLinkType
-            };
-            if (cloudinaryUrl && cloudinaryUrl.length) {
-              params.cloudinaryUrl = cloudinaryUrl;
-            }
-            if (config.CNAME) {
-              params.cname = config.CNAME;
-            }
-            console.log("activeLinkType", activeLinkType, entities.length);
-            if (activeLinkType === "ios-content" && entities.length) {
-              params.entities = JSON.stringify(entities);
-            }
-            const res1 = await axios.post(`${mongoApiUrl}/savemessage`, params);
-            // if (lastMessageData.message_id && chatId === lastMessageData.chat.id) {
-            //   bot.deleteMessage(chatId, lastMessageData.message_id);
-            // }
-            // const messageData = await bot.sendMessage(chatId, `Uploaded ${tempData.indexOf(el) + 1}/${tempData.length}`);
-            // lastMessageData = messageData;
           } catch (error) {
             Logger.error(error.message || "SaveMsg error occured");
           }
