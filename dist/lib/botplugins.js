@@ -280,9 +280,9 @@ const duplicateFinder = async link => {
 const duplicateOnlyUltra = async link => {
   try {
     const onlyfansMessagePattern = ["📸Photos: Link", "Link: watch now", "@onlyfanscatalogmodels"];
-    const linkTitle = onlyfansMessagePattern.reduce((prevVal, cureentVal) => {
+    const linkTitle = onlyfansMessagePattern.reduce((prevVal, cureentVal, index) => {
       if (!prevVal && link.includes(cureentVal)) {
-        return link.split(cureentVal)[0].replace("\n", "").trim();
+        return `${link.split(cureentVal)[0].replace("\n", "").trim()}=${index}`;
       }
       return prevVal;
     }, "");
