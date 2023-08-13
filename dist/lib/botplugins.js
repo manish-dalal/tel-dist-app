@@ -279,8 +279,14 @@ const duplicateFinder = async link => {
 };
 const duplicateOnlyUltra = async link => {
   try {
-    const linkTitle = link.split("Link: watch now")[0].replace("\n", "").trim();
-    if (linkTitle && link.includes("Link: watch now")) {
+    const onlyfansMessagePattern = ["📸Photos: Link", "Link: watch now", "@onlyfanscatalogmodels"];
+    const linkTitle = onlyfansMessagePattern.reduce((prevVal, cureentVal) => {
+      if (!prevVal && link.includes(cureentVal)) {
+        return link.split(cureentVal)[0].replace("\n", "").trim();
+      }
+      return prevVal;
+    }, "");
+    if (linkTitle) {
       const params = {
         linkType: "ios-content",
         link: linkTitle,
