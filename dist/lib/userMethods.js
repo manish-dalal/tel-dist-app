@@ -7,6 +7,9 @@ const {
 const axios = require("axios");
 const get = require("lodash/get");
 const {
+  Logger
+} = require("../utils/winston");
+const {
   StringSession
 } = require("telegram/sessions");
 const config = require("../config");
@@ -16,21 +19,27 @@ const sleep = ms => {
 };
 const getUserClient = type => {
   return new Promise(async (resolve, reject) => {
-    if (userClient) {
-      await userClient.destroy();
-      userClient = null;
-    }
-    const userSessionToken = type === "joinChannelAdmin" ? config.JOIN_CHANNEL_USER_TOKEN : config.TERABOX_ADMIN_USER_TOKEN;
-    if (userSessionToken) {
-      const apiId = 8779238;
-      const apiHash = "41a0189c83fa2f1fb2805a37db370878";
-      const session = new StringSession(userSessionToken || ""); // You should put your string session here
-      userClient = new TelegramClient(session, apiId, apiHash, {
-        connectionRetries: 2,
-        autoReconnect: false
-      });
-      await userClient.connect();
+    if (await userClient.checkAuthorization()) {
       return resolve(userClient);
+    } else {
+      if (userClient) {
+        await userClient.destroy();
+        userClient = null;
+      }
+      const userSessionToken = type === "joinChannelAdmin" ? config.JOIN_CHANNEL_USER_TOKEN : config.TERABOX_ADMIN_USER_TOKEN;
+      if (userSessionToken) {
+        const apiId = 8779238;
+        const apiHash = "41a0189c83fa2f1fb2805a37db370878";
+        const session = new StringSession(userSessionToken || ""); // You should put your string session here
+        userClient = new TelegramClient(session, apiId, apiHash, {
+          connectionRetries: type === "joinChannelAdmin" ? 1 : 5,
+          requestRetries: type === "joinChannelAdmin" ? 1 : 5,
+          autoReconnect: false
+        });
+        await userClient.connect();
+        return resolve(userClient);
+      }
+      console.log("I am connected to telegram servers but not logged in with any account/bot");
     }
     return resolve(null);
   });
@@ -42,27 +51,32 @@ const checkConvertedWait = async ({
 }) => {
   return new Promise(async (resolve, reject) => {
     const client = await getUserClient();
-    await sleep(8000 * (numOfAttempt + 1));
-    const result = await client.invoke(new Api.messages.GetHistory({
-      peer: "@LinkConvertTerabot",
-      addOffset: 0,
-      limit: 4,
-      maxId: 0,
-      minId: 0
-    }));
-    const messages = result.messages;
-    const fromId = message.fromId.userId;
-    if (!messages[0].fromId && messages[0].message !== link) {
-      return resolve(messages[0].message);
-    } else if (numOfAttempt > 1) {
-      return resolve("");
-    } else {
-      const resp = await checkConvertedWait({
-        link,
-        numOfAttempt: numOfAttempt + 1,
-        message
-      });
-      return resolve(resp);
+    try {
+      await sleep(8000 * (numOfAttempt + 1));
+      const result = await client.invoke(new Api.messages.GetHistory({
+        peer: "@LinkConvertTerabot",
+        addOffset: 0,
+        limit: 4,
+        maxId: 0,
+        minId: 0
+      }));
+      const messages = result.messages;
+      const fromId = message.fromId.userId;
+      if (!messages[0].fromId && messages[0].message !== link) {
+        return resolve(messages[0].message);
+      } else if (numOfAttempt > 1) {
+        return resolve("");
+      } else {
+        const resp = await checkConvertedWait({
+          link,
+          numOfAttempt: numOfAttempt + 1,
+          message
+        });
+        return resolve(resp);
+      }
+    } catch (error) {
+      Logger.error(`checkConvertedWait TELGRAM CONNECT ${error.message}` || "checkConvertedWait error occured");
+      await client.connect();
     }
   });
 };
@@ -71,27 +85,32 @@ const convertTerboxLink = async ({
   numOfAttempt = 0
 }) => {
   const client = await getUserClient();
-  if (client) {
-    const aaa = await client.sendMessage("@LinkConvertTerabot", {
-      message: link
-    });
-    const resp = await checkConvertedWait({
-      link,
-      numOfAttempt: 0,
-      message: aaa
-    });
-    if (resp !== link) {
-      return resp;
-    } else if (numOfAttempt > 0) {
-      return "";
-    } else {
-      return convertTerboxLink({
-        link,
-        numOfAttempt: numOfAttempt + 1
+  try {
+    if (client) {
+      const aaa = await client.sendMessage("@LinkConvertTerabot", {
+        message: link
       });
+      const resp = await checkConvertedWait({
+        link,
+        numOfAttempt: 0,
+        message: aaa
+      });
+      if (resp !== link) {
+        return resp;
+      } else if (numOfAttempt > 0) {
+        return "";
+      } else {
+        return convertTerboxLink({
+          link,
+          numOfAttempt: numOfAttempt + 1
+        });
+      }
+    } else {
+      return "";
     }
-  } else {
-    return "";
+  } catch (error) {
+    Logger.error(`convertTerboxLink TELGRAM CONNECT ${error.message}` || "convertTerboxLink error occured");
+    await client.connect();
   }
 };
 const getChatInviteLink = (token, chatId) => {

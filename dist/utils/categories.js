@@ -29,6 +29,12 @@ const catOptions = [{
 }, {
   label: "7-18+",
   value: "7"
+}, {
+  label: "Movies",
+  value: "8"
+}, {
+  label: "Series",
+  value: "9"
 }];
 exports.catOptions = catOptions;
 const categories = [...catOptions, ...envcategories];
