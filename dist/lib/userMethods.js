@@ -19,27 +19,23 @@ const sleep = ms => {
 };
 const getUserClient = type => {
   return new Promise(async (resolve, reject) => {
-    if (await userClient.checkAuthorization()) {
+    if (userClient) {
+      await userClient.destroy();
+      userClient = null;
+      await sleep(1000);
+    }
+    const userSessionToken = type === "joinChannelAdmin" ? config.JOIN_CHANNEL_USER_TOKEN : config.TERABOX_ADMIN_USER_TOKEN;
+    if (userSessionToken) {
+      const apiId = 8779238;
+      const apiHash = "41a0189c83fa2f1fb2805a37db370878";
+      const session = new StringSession(userSessionToken || ""); // You should put your string session here
+      userClient = new TelegramClient(session, apiId, apiHash, {
+        connectionRetries: type === "joinChannelAdmin" ? 1 : 5,
+        requestRetries: type === "joinChannelAdmin" ? 1 : 5,
+        autoReconnect: false
+      });
+      await userClient.connect();
       return resolve(userClient);
-    } else {
-      if (userClient) {
-        await userClient.destroy();
-        userClient = null;
-      }
-      const userSessionToken = type === "joinChannelAdmin" ? config.JOIN_CHANNEL_USER_TOKEN : config.TERABOX_ADMIN_USER_TOKEN;
-      if (userSessionToken) {
-        const apiId = 8779238;
-        const apiHash = "41a0189c83fa2f1fb2805a37db370878";
-        const session = new StringSession(userSessionToken || ""); // You should put your string session here
-        userClient = new TelegramClient(session, apiId, apiHash, {
-          connectionRetries: type === "joinChannelAdmin" ? 1 : 5,
-          requestRetries: type === "joinChannelAdmin" ? 1 : 5,
-          autoReconnect: false
-        });
-        await userClient.connect();
-        return resolve(userClient);
-      }
-      console.log("I am connected to telegram servers but not logged in with any account/bot");
     }
     return resolve(null);
   });
