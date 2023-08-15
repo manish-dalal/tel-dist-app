@@ -143,7 +143,8 @@ setInterval(async () => {
             channel: groupInfo.id
           });
           console.log("fullChat==", tempstartQueue.indexOf(task));
-          console.log("fullChat==DATA", JSON.stringify(fullChat));
+          // console.log("fullChat==DATA", JSON.stringify(fullChat));
+          console.log("fullChat==DATA");
           const filteredfullChat = {};
           if (!isEmpty(fullChat.result)) {
             filteredfullChat["pts"] = get(fullChat, "result.fullChat.pts", 0);
