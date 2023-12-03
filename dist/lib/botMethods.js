@@ -14,16 +14,26 @@ const getDateString = () => {
   const dateStr = `(${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)})`;
   return timestr + dateStr;
 };
+const tokenRequesterBot = config.TELEGRAM_REQUESTER_BOT;
+const token0 = config.TELEGRAM_TOKEN_0;
 const token1 = config.TELEGRAM_TOKEN_1;
 const token2 = config.TELEGRAM_TOKEN_2;
 const token3 = config.TELEGRAM_TOKEN_3;
 const token4 = config.TELEGRAM_TOKEN_4;
 const token5 = config.TELEGRAM_TOKEN_5;
+let requestHandlerBot = null;
+let bot0 = null;
 let bot1 = null;
 let bot2 = null;
 let bot3 = null;
 let bot4 = null;
 let bot5 = null;
+if (tokenRequesterBot && !requestHandlerBot) {
+  requestHandlerBot = new telegram(tokenRequesterBot, {});
+}
+if (token0 && !bot0) {
+  bot0 = new telegram(token0, {});
+}
 if (token1 && !bot1) {
   bot1 = new telegram(token1, {});
 }
@@ -47,16 +57,16 @@ const setBot = bot => {
   telegramBot = bot;
 };
 const approveChatJoinRequest = async (chatId, userId, options) => {
-  const res = await telegramBot.approveChatJoinRequest(chatId, userId, options);
+  const res = await (requestHandlerBot || telegramBot).approveChatJoinRequest(chatId, userId, options);
   return res;
 };
 const declineChatJoinRequest = async (chatId, userId, options) => {
-  const res = await telegramBot.declineChatJoinRequest(chatId, userId, options);
+  const res = await (requestHandlerBot || telegramBot).declineChatJoinRequest(chatId, userId, options);
   return res;
 };
 const botList = [{
   botId: 1,
-  bot: telegramBot,
+  bot: bot0 || telegramBot,
   lastTelgramSendRequest: new Date().getTime()
 }, bot1 && {
   botId: 2,
@@ -80,7 +90,7 @@ const botList = [{
   lastTelgramSendRequest: new Date().getTime()
 }];
 const getBotList = () => {
-  botList[0].bot = telegramBot;
+  botList[0].bot = bot0 || telegramBot;
   const sortedBotList = orderBy(botList.filter(el => !!el), "lastTelgramSendRequest");
   return sortedBotList;
 };
