@@ -264,7 +264,7 @@ const getTeraboxTitle = url => {
   return new Promise((resolve, reject) => {
     xClient(url, "title")(function (err, title) {
       if (err) reject(err);
-      const newTitle = title.split("- Share Files")[0] || "";
+      const newTitle = (title || '').split("- Share Files")[0] || "";
       const finalTitle = newTitle.trim();
       console.log(finalTitle);
       return resolve(finalTitle);
